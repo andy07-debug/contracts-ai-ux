@@ -22,6 +22,7 @@ function user(text,t){ const el=TPL.user.cloneNode(true); el.removeAttribute('da
 function raw(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return addEl(d.firstElementChild); }
 const pill=(text,attrs)=>`<div class="answer-example-item" style="display:block;width:100%"><span class="flex flex-col space-y-1"><div class="inline-flex items-center gap-2"><span ${attrs} class="rounded-[8px] inline-flex max-w-[36rem] items-start gap-1.5 px-3 py-1 my-1 shadow-sm transition-colors duration-200 ease-in-out cursor-pointer bg-[#f0f5ff] text-black border border-[#60A5FA] hover:bg-[#f0f5ff] hover:text-black hover:shadow-md hover:scale-[1.02]" data-pill="true" style="min-width:170px"><span class="flex items-center justify-center text-xl transition-colors">+</span><span class="text-sm leading-7"><span style="margin:0;display:inline">${text}</span></span></span></div></span></div>`;
 const pills=list=>`<div style="display:flex;flex-direction:column;align-items:flex-start">${list.map(([t,a])=>pill(t,a)).join('')}</div>`;
+const opts=list=>list.map(([t,a])=>opt(t,a)).join('');
 let lastAim=-1e9;
 function scrollChat(el,mode){
   if(!el) return Promise.resolve(); lastAim=performance.now();
@@ -51,7 +52,7 @@ function clock(){ st.t++; const base=cur>=11?50:cur>=7?44:cur>=3?42:39; return `
 let screen='home';
 function show(name){ screen=name; $$('#screens > .scr').forEach(s=>s.classList.toggle('on',s.id==='scr-'+name)); closeOv();
   if(name==='corpus') renderCorpus(); if(name==='projects') renderProjects(); if(name!=='search'&&name!=='contract') document.body.classList.remove('wide'); updateHint(); }
-function greet(){ return bot(`<p class="cxp">I can help you search contracts and clauses based on your needs, review contracts against your standard terms and reference agreements, and generate AI-powered redlines in minutes.</p><p class="cxp">Suggested Actions:</p><div class="cxp">Select from the above, or if it's something else, tell me in the chat below${pills([['Search contracts','id="sg-main" data-act="sugg" data-k="main"'],['Redline a contract','data-act="sugg" data-k="redline0"'],['Compare contracts','data-act="sugg" data-k="compare0"']])}</div>`,'9:38 AM'); }
+function greet(){ return bot(`<p class="cxp"><b>Suggested Actions:</b></p><p class="cxp">Please select one of the options below to get started.</p>${opt('Search contracts','id="sg-main" data-act="sugg" data-k="main"')}${opt('Redline a contract','data-act="sugg" data-k="redline0"')}${opt('Compare contracts','data-act="sugg" data-k="compare0"')}${opt('Generate a contract','data-act="gen"')}${opt('Validate contract integrity','data-act="sugg" data-k="validate"')}${opt('Or, type your question below','data-act="focus"')}`,'9:38 AM'); }
 function renderSugg(){}
 function closeOv(){ ['#ov-menu','#ov-modes','#ov-filter','#ov-hamb'].forEach(s=>{const e=$(s); if(e) e.style.display='none';}); $$('.org-list').forEach(x=>x.classList.remove('on')); }
 
@@ -71,19 +72,6 @@ function renderCorpus(){
 const PROJECTS=[['Vendor contracts FY27','Legal review · 42 contracts','In review'],['IT services renewals','Procurement · 18 contracts','Active'],['Grant agreements 2027','Programs · 26 contracts','Active'],['Lease portfolio','Real estate · 11 contracts','Active'],['Facilities and maintenance','Operations · 9 contracts','In review'],['Template library','Legal · 5 templates','Gold standard']];
 function renderProjects(){ const q=($('#pj-search').value||'').toLowerCase();
   $('#pj-grid').innerHTML=PROJECTS.filter(p=>!q||p.join(' ').toLowerCase().includes(q)).map(p=>`<div class="pj" data-act="pj-open" data-p="${p[0]}"><b>${p[0]}</b><small>${p[1]}</small><div class="pjm"><span class="pc ${p[2]==='In review'?'blue':p[2]==='Active'?'ok':'grey'}">${p[2]}</span><span class="pc grey">Sample</span></div></div>`).join('')||'<p style="color:#6B7280;font-size:14px">No projects match.</p>'; }
-
-/* search results */
-function srCard(r,low){ return `<div class="sr ${low?'low':''} ${st.sel===(low?'low':r.n-1)?'on':''}" id="sr-${low?'low':r.n}" data-act="sel" data-i="${low?'low':r.n-1}">
-   <div class="sr-top"><span class="rk">${low?'!':r.n}</span><b>${r.cp}</b><span class="rel num">${r.rel}%</span></div>
-   <div class="meta">${r.t} · ${r.sec}</div><div class="qt">“${r.q}”</div><div class="rbar"><i style="width:${r.rel}%"></i></div></div>`; }
-function renderResults(){ $('#sr-list').innerHTML=SR.slice(0,3).map(r=>srCard(r)).join('')+`<h6>Close, but not a match</h6>`+srCard(LOW,true); }
-function selectResult(i,hl){ st.sel=i; const r=i==='low'?LOW:SR[i], d=DOCS[r.doc];
-  $$('.sr').forEach(x=>x.classList.toggle('on',x.dataset.i===String(i)));
-  $('#pv-name').textContent=d.name; $('#pv-page').textContent=d.pg; $('#pv-doc').innerHTML=d.html(); $('#pv-wrap').style.transform='';
-  if(hl){ const c=$('#'+d.hl); if(c){ c.classList.add(d.bad?'hlbad':'hl'); aimPaper(c); } } }
-function aimPaper(c){ const bg=$('#pv-bg'), wrap=$('#pv-wrap'); wrap.style.transition='none'; wrap.style.transform=''; void wrap.offsetHeight; wrap.style.transition='';
-  const off=(c.getBoundingClientRect().top-wrap.getBoundingClientRect().top)/Z; const H=bg.clientHeight, ph=wrap.offsetHeight;
-  const y=Math.max(0,Math.min(off-H*0.35, ph-H+32)); if(!ANIM) wrap.style.transition='none'; wrap.style.transform=`translateY(${-y}px)`; if(!ANIM){ void wrap.offsetHeight; wrap.style.transition=''; } }
 
 /* contract views */
 function setView(v){ st.view=v; $$('#tabs .tab').forEach(t=>t.classList.toggle('on',t.dataset.v===v)); $$('#scr-contract .view').forEach(x=>x.classList.toggle('on',x.id==='view-'+v));
@@ -157,63 +145,39 @@ const STEPS=[
     if(ANIM) pulseSend(); box.value=''; box.blur(); hideCursor();
     const u=user(q,'9:41 AM'); await scrollChat(u);
  }},
- {id:'working',label:'Searching every contract',run:async t=>{ await work(t,[
-      ['Read every contract you can access · <b>1,248 contracts</b>','1,206 executed and 42 in review. Amendments are read with the contracts they change.','0.4'],
-      ['Found the payment clauses · <b>3,912 clauses</b>','Payment, invoicing and milestone-payment clauses, including schedules and amendments.','0.3'],
-      ['Read each payment term in days · <b>15 to 90 days</b>','“forty-five (45) days”, “net 45” and “45 days after acceptance” all read as 45 days.','0.4'],
-      ['Ranked the matches by relevance · <b>6 matches</b>','Exact wording, whether the clause is in force, and whether an amendment changes it.','0.3'],
-      ['Checked the matches for gaps · <b>1 gap</b>','CTR-2026-01184, a draft in the review queue, asks for payment in 15 days.','0.4']],'1.8'); }},
+ {id:'working',label:'Searching every contract',run:async t=>{ await analyzing(t,'Contract Search',[
+      ['Read every contract you can access · <b>1,248 contracts</b>'],['Found the payment clauses · <b>3,912 clauses</b>'],['Read each payment term in days · <b>15 to 90 days</b>'],['Ranked by relevance · <b>17 relevant, top 9</b>'],['Checked each match for gaps · <b>1 gap</b>']],'1.8'); }},
  {id:'results',label:'Ranked results',run:async t=>{
-    show('search'); renderResults(); selectResult(0,false);
-    const a=bot(`<p class="lead"><b>6 contracts</b> have payment terms of 45 days or more. Here are the top matches, ranked by relevance:</p>
-      <div class="rres">${SR.slice(0,3).map(r=>`<div class="rr"><div class="rr-t"><span class="rk">${r.n}</span><b>${r.cp}</b><span class="sc num">${r.rel}%</span></div><div class="rm">${r.t} · ${r.sec}</div>${r.n===1?`<span class="why" id="why1" data-act="why">Why this clause is the 1st match ${ico('i-chev')}</span>
-        <div class="xp" id="xp"><div class="cdcard">
-          <div class="cdh">${ico('i-cpu')}Cognitive Decisioning<span class="strength">Decision Strength: 98%</span></div>
-          <div class="cdsec"><div class="rh"><span class="ic2">${ico('i-bulb')}</span><div><b>Reasoning</b><small>Why is this the 1st match?</small></div></div>
-            <ol><li>Section 6.2 makes undisputed invoices due within <b>forty-five (45) days</b> of a proper invoice. That meets “45 days or more” exactly. <span class="seclink" id="lnk-62" data-act="citation">Section 6.2${ico('i-chev')}</span>
-               <div class="vcite" id="vcite">
-                 <div class="vc"><div class="vch">Clause summary</div><small>Details</small>
-                   <div class="vt">Section 6.2 — Payment terms</div>
-                   <ul><li><b>Contract:</b> Northwind Cloud Systems · Cloud hosting MSA</li><li><b>Number:</b> CTR-2025-00733, executed July 1, 2025</li><li><b>Selected point:</b> invoices due in 45 days</li></ul>
-                   <div class="vt">Why this answers your question:</div>
-                   <p>Your question, <mark>“${QUESTION}”</mark>, is answered by this clause because it sets <mark>the payment due date at forty-five (45) days</mark>.</p></div>
-                 <div class="vc"><div class="vch link" id="genie-btn" data-act="genie">Northwind MSA — Section 6.2 ${ico('i-ext')}</div>
-                   <div class="pagethumb"><div class="ph">NORTHWIND CLOUD SYSTEMS · MSA · PAGE 4 OF 22</div><b>6.1 Invoices.</b> Vendor shall submit invoices monthly in arrears, with the purchase order number and a description of the Services delivered.<br><b>6.2 Payment terms.</b> <mark>Undisputed invoices are due within forty-five (45) days of receipt of a proper invoice.</mark><br><b>6.3 Disputed amounts.</b> The Agency shall notify Vendor in writing of any disputed amount within fifteen (15) days.</div></div>
-               </div></li>
-              <li>Amendment 1 (March 2026) replaces the price schedule only. It leaves the payment term as it is. <span class="seclink" data-act="cite" data-c="7.2">Section 7.2${ico('i-chev')}</span></li>
-              <li>The contract is active until June 30, 2028, so the term applies today. <span class="seclink" data-act="cite" data-c="7.1">Section 7.1${ico('i-chev')}</span></li></ol>
-            <div class="factors" id="factors"><h6>Supporting factors</h6>${['Exact match on days','Clause in force','No conflicting amendment','Same wording as your template'].map(f=>`<span class="factor">${ico('i-check')}${f}</span>`).join('')}</div></div>
-          <div class="cdfoot"><span class="badge">${ico('i-cpu')}Cognitive Decisioning AI</span><span class="strength">Decision Strength: 98%</span></div>
-        </div></div>`:''}</div>`).join('')}</div>
-      <p style="margin-top:10px">Three more match lower down. One contract in the review queue does <b>not</b> meet it; I’ll show you why.</p>`,'9:41 AM');
+    show('results'); renderResults();
+    const a=bot(`<p>Filter the results by clicking on checkboxes.</p><p style="margin-top:6px">I found <b>17</b> relevant contracts</p>${totalCard()}
+      <p>. Here are the <b>top 9 contracts</b> as per your request for contracts that have payment terms of 45 days or more.</p>
+      <div class="lm-coll" data-act="lm-coll">Contracts that have payment terms of 45 days or more${ico('i-chev')}</div><div id="lm-ci">${RES.slice(0,3).map(chatItem).join('')}<p style="font-size:14px;color:#6B7280;margin:4px 0 0">6 more are in the results on the right.</p></div>`,'9:41 AM');
+    const b=bot(`<p><b>1 contract in your review queue does not meet this term.</b></p>${opt('Show me the gap','id="show-gap" data-act="show-gap"')}
+      <p style="margin-top:10px">If you would like to explore more such contracts, you can load additional results below:</p>${opt('Show more of such contracts','data-act="free" data-q="more"')}
+      <p class="lm-lbl">Or you can search through the <span class="lm-lib" data-act="corpus">Contract Library</span> for:</p>${opt('contracts with extended payment terms','data-act="free" data-q="ext"')}${opt('contracts with payment terms greater than 45 days','data-act="free" data-q="gt45"')}
+      <p class="lm-lbl">None of the above, just:</p>${opt('Please enter your request so that I can refine and filter the contract list accordingly','data-act="focus"')}`,'9:41 AM');
     await scrollChat(a,'top');
  }},
  {id:'reasoning',label:'Reasoning, step by step',run:async t=>{
-    const w=$('#why1'); if(ANIM){await point(w); await sleep(120); guard(t);}
-    w.classList.add('open'); document.body.classList.add('wide'); const xp=$('#xp'); xp.classList.add('on'); hideCursor();
-    const fs=[...xp.querySelectorAll('.factor')]; if(ANIM){ fs.forEach(f=>f.classList.add('wait')); xp.classList.remove('rise'); void xp.offsetWidth; xp.classList.add('rise'); }
-    expand(xp,620); await sleep(ANIM?560:0); await scrollChat(xp,'top');
-    if(ANIM){ await sleep(400); for(const f of fs){ guard(t); f.classList.remove('wait'); await sleep(260); } }
+    const w=$('#why-1'); if(ANIM){await point(w); await sleep(120); guard(t);} hideCursor();
+    const lis=[...$('#cd-1').querySelectorAll('ol li')]; if(ANIM) lis.forEach(l=>l.classList.add('wait'));
+    openWhy(1,true); await scrollList($('#lmc-1'));
+    if(ANIM){ for(const l of lis){ await sleep(380); guard(t); l.classList.remove('wait'); } }
  }},
  {id:'citation',label:'The exact clause',run:async t=>{
-    const l=$('#lnk-62'); if(ANIM){await point(l); await sleep(120); guard(t);} hideCursor();
-    l.classList.add('open'); const v=$('#vcite'); v.classList.add('on'); if(ANIM){v.classList.remove('rise');void v.offsetWidth;v.classList.add('rise');} expand(v,560);
-    selectResult(0,true); await sleep(ANIM?140:0); await scrollChat(l,'top');
+    const v=$('#vp-1'); if(ANIM){await point(v); await sleep(120); guard(t);} hideCursor();
+    openPdf(1,true); await sleep(ANIM?120:0); await scrollList($('#pdf-1'),'bottom');
  }},
  {id:'gap',label:'Flags the gap',run:async t=>{
-    if(ANIM&&!st.genie){ const g=$('#genie-btn'); await point(g); await sleep(120); guard(t); hideCursor(); openGenie(); await sleep(2800); guard(t); }
-    closeModal(); document.body.classList.remove('wide'); await sleep(ANIM?450:0); selectResult('low',true);
-    const n=bot(`<p>One more thing before this goes further.</p>
-      <div class="gapc"><div class="gch">${ico('i-alert')}Gaps in decision<span class="sc num">40% match</span></div>
-        <div class="gcb"><div class="who">CTR-2026-01184 · Kestrel Facility Services · draft in the review queue</div>
-          Payment is due in <b>15 days, not the 45</b> you asked for. Your template says 45.
-          <q>“The Agency shall pay all invoices within fifteen (15) days of the invoice date.”</q>
-          <div class="gfix"><span data-act="free" data-q="fix15">Fix: set payment to 45 days</span><span data-act="sel" data-i="low">Show Section 3.2</span></div></div></div>
-      <p style="margin-top:12px">Suggested next steps:</p>${pills([['Redline CTR-2026-01184 against our template','id="chip-open" data-act="open-main"'],['Show all 6 matches','data-act="free" data-q="all6"'],['Export this list','data-act="free" data-q="export"']])}`,'9:42 AM');
+    const g=$('#show-gap'); if(ANIM&&g){await point(g); await sleep(120); guard(t);} hideCursor();
+    openPdf(1,false); openWhy(1,false); show('results');
+    const c=$('#lmc-9'); await scrollList(c); c.classList.add('flash'); setTimeout(()=>c.classList.remove('flash'),1600); await sleep(ANIM?300:0); openWhy(9,true); await scrollList($('#cd-9 .lm-sec.bad'),'bottom');
+    const n=bot(`<div class="lm-gapbox"><div class="h">${ico('i-alert')}Gaps in decision · 9th match, 40%</div><p><b>CTR-2026-01184 · Kestrel Facility Services</b> (draft in your review queue): payment is due in <b>15 days, not the 45</b> you asked for. Your template says 45.</p></div>
+      <p style="margin-top:10px">Suggested next steps:</p>${opt('Redline CTR-2026-01184 against our template','id="chip-open" data-act="open-main"')}${opt('Show more of such contracts','data-act="free" data-q="more"')}`,'9:42 AM');
     await scrollChat(n,'top');
  }},
  {id:'open',label:'Contract opens',run:async t=>{
-    const c=$('#chip-open'); if(ANIM&&c){await point(c); await sleep(120); guard(t);} hideCursor();
+    const c=$('#rd-9')||$('#chip-open'); if(ANIM&&c){await point(c); await sleep(120); guard(t);} hideCursor();
     show('contract'); setView('DOC');
     raw(`<div class="divider">Opened CTR-2026-01184</div>`);
     const m=bot(`<p>This is a vendor draft of a <b>facilities maintenance services agreement</b> with Kestrel Facility Services: $1.2M over 3 years.</p><p style="margin-top:6px">It came in on the vendor’s own paper, so I’ll compare it with your <b>Vendor services template v4</b>, clause by clause.</p>
@@ -223,7 +187,7 @@ const STEPS=[
  {id:'redline',label:'AI redline',run:async t=>{
     const b=$('#cmp-btn'); if(ANIM&&b){await point(b); await sleep(120); guard(t);} hideCursor(); if(b) b.classList.add('picked');
     setView('RL'); renderRedline();
-    await work(t,[['Read the vendor draft · <b>18 pages, 46 clauses</b>','Including Schedules A to C.','0.9'],['Matched each clause to your template · <b>Vendor services v4</b>','46 of 46 clauses paired, 2 renumbered.','0.6'],['Compared the wording clause by clause · <b>9 deviations</b>','37 clauses match the template.','1.2'],['Rated each deviation by risk · <b>4 high, 5 medium</b>','Risk to the Agency: money, liability, exit rights and jurisdiction.','0.8'],['Sorted routine fixes from legal calls · <b>7 routine, 2 for you</b>','Routine: the template already says what to do. Legal calls: a business trade-off.','0.7']],'4.2');
+    await analyzing(t,'AI Redlining',[['Read the vendor draft · <b>18 pages, 46 clauses</b>','Including Schedules A to C.','0.9'],['Matched each clause to your template · <b>Vendor services v4</b>','46 of 46 clauses paired, 2 renumbered.','0.6'],['Compared the wording clause by clause · <b>9 deviations</b>','37 clauses match the template.','1.2'],['Rated each deviation by risk · <b>4 high, 5 medium</b>','Risk to the Agency: money, liability, exit rights and jurisdiction.','0.8'],['Sorted routine fixes from legal calls · <b>7 routine, 2 for you</b>','Routine: the template already says what to do. Legal calls: a business trade-off.','0.7']],'4.2');
     for(let i=0;i<DEVS.length;i++){ guard(t); await updDev(i,'marked',true); await sleep(240); }
     const a=bot(`<p class="lead"><b>9 deviations</b> from your template: 4 high risk, 5 medium.</p>
       <div class="devsum"><div class="dh">Routine · I can fix these to match the template<span class="n">7</span></div><ul>${DEVS.filter(d=>d.fix).map(d=>`<li><i style="background:${d.r==='high'?'var(--bad)':'#E0A800'}"></i>${d.n}<span>§ ${d.s}</span></li>`).join('')}</ul></div>
@@ -276,6 +240,11 @@ const STEPS=[
     st.filter='All'; show('corpus');
  }},
 ];
+async function analyzing(t,type,steps,secs){
+  const el=bot(`<div class="lm-qt">Question Type: <span class="ty">${type}</span> — <span class="stt">${ANIM?'Analyzing...':'Done in '+secs+' s'}</span></div><div class="lm-gen" data-act="lm-gen">Generating your summary ${ico('i-chev')}</div><div class="lm-steps">${steps.map((s,i)=>`<div class="lm-st"><span class="d ${ANIM?(i===0?'pend':''):'done'}"></span><span>${s[0]}</span></div>`).join('')}</div>`);
+  await scrollChat(el);
+  if(ANIM){ const ds=[...el.querySelectorAll('.lm-st .d')]; for(let i=0;i<ds.length;i++){ ds[i].className='d pend'; await sleep(800); guard(t); ds[i].className='d done'; } el.querySelector('.stt').textContent='Done in '+secs+' s'; }
+}
 async function work(t,steps,secs){
   const el=TPL.work.cloneNode(true); el.removeAttribute('data-tpl');
   const title=el.querySelector('.gpt-color'); title.innerHTML=ANIM?'Working…':`What I did for ${secs} seconds`;
@@ -299,15 +268,19 @@ const FREE={
  why2:{q:'Why are these two left for me?',a:()=>`<p>Both are business trade-offs, not wording fixes. The liability cap and the insurance limit change how much risk the Agency carries, and a vendor may push back on price if you hold the line. I recommend your template for both, but the call is yours.</p>`},
  recap:{q:'Summarise this review',a:()=>`<ul class="bl"><li><b>Nov 18</b> · vendor draft v2 received. The pre-check flagged 9 deviations overnight.</li><li><b>Nov 20, 9:46 AM</b> · AI redline against Vendor services template v4.</li><li><b>9:47 AM</b> · 7 routine deviations fixed to match the template.</li><li><b>9:48 AM</b> · you decided liability and insurance.</li><li><b>9:49 AM</b> · approved and sent for signature.</li></ul><p>Review time: <b>5 minutes</b>, against 3 days on average.</p>`},
  renew:{q:'Does it renew automatically?',a:()=>st.status==='review'?`<p><b>Yes, as drafted.</b> Section 2.2 renews it every year unless someone cancels. Your template allows renewal only by a written amendment.</p>`:`<p><b>No.</b> The redline removed the auto-renewal; Section 2.2 now allows renewal only by a written amendment, as in your template.</p>`},
- redline0:{q:'Redline a contract',a:()=>`<p>Which contract? <b>CTR-2026-01184</b> (Kestrel Facility Services, facilities maintenance) is the one in the review queue with the most deviations from its template.</p>${pills([['Redline CTR-2026-01184 against our template','data-act="open-main"']])}`},
- compare0:{q:'Compare contracts',a:()=>`<p>I can compare any contract with your gold-standard template or with another contract. A good start is <b>CTR-2026-01184</b> against <b>Vendor services template v4</b>.</p>${pills([['Compare CTR-2026-01184 with our template','data-act="open-tpl"']])}`},
+ more:{q:'Show more of such contracts',a:()=>`<p>Here are the next 8 of the 17:</p><table class="mini"><tr><th>Contract</th><th>Term</th><th class="r">Score</th></tr>${[['Harbor Youth Alliance · grant','45 days after report','52%'],['Harborline Properties · lease','Monthly rent','48%'],['Eastside Community Kitchen · grant','Advance + 45 days','46%'],['Bridgeway Jobs Network · grant','Quarterly, 45 days','45%'],['Pier Nine Holdings · lease','Monthly rent','41%']].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td class="r num">${r[2]}</td></tr>`).join('')}</table>`},
+ ext:{q:'contracts with extended payment terms',a:()=>`<p><b>2 contracts</b> pay later than 45 days: <b>Summit Talent Partners</b> (60 days) and <b>Harborline Properties</b> (rent paid quarterly in arrears).</p>`},
+ gt45:{q:'contracts with payment terms greater than 45 days',a:()=>`<p><b>1 contract</b> is above 45 days: <b>Summit Talent Partners</b>, IT staffing MSA, Section 5.1, sixty (60) days.</p>`},
+ validate:{q:'Validate contract integrity',a:()=>`<p>I checked the 42 contracts in review for missing schedules, signature blocks and cross-references. <b>2 need attention</b>: CTR-2026-01184 (Schedule C referenced but not attached) and CTR-2026-01169 (no data-return clause).</p>`},
+ redline0:{q:'Redline a contract',a:()=>`<p>Which contract? <b>CTR-2026-01184</b> (Kestrel Facility Services, facilities maintenance) is the one in the review queue with the most deviations from its template.</p>${opts([['Redline CTR-2026-01184 against our template','data-act="open-main"']])}`},
+ compare0:{q:'Compare contracts',a:()=>`<p>I can compare any contract with your gold-standard template or with another contract. A good start is <b>CTR-2026-01184</b> against <b>Vendor services template v4</b>.</p>${opts([['Compare CTR-2026-01184 with our template','data-act="open-tpl"']])}`},
  corpus:{q:'Which contracts are in review?',a:()=>`<p><b>42 contracts</b> are in legal review. Two need attention: <span class="lnk" data-act="row" data-id="${MAIN}">CTR-2026-01184</span> ${st.sent?'(now out for signature)':'(9 deviations from your vendor template)'} and <span class="lnk" data-act="row" data-id="CTR-2026-01169">CTR-2026-01169</span> (milestone acceptance and data return).</p>`},
 };
 let freeBusy=false;
 async function freeQA(key,custom){
   if(freeBusy||busy) return; freeBusy=true; const save=ANIM; ANIM=true;
   try{
-    const f=FREE[key]||{q:custom,a:()=>`<p>In this demo I answer questions about these contracts. Try “${QUESTION}”</p>${pills([[QUESTION,'data-act="ask-main"']])}`};
+    const f=FREE[key]||{q:custom,a:()=>`<p>In this demo I answer questions about these contracts. Try “${QUESTION}”</p>${opts([[QUESTION,'data-act="ask-main"']])}`};
     const u=user(custom||f.q); await scrollChat(u);
     const ty=raw(`<div class="group/user-msg flex flex-col items-start gap-1 mb-2"><div class="w-full flex flex-row justify-start items-start gap-3"><div style="max-height:32px;max-width:32px"><img alt="" src="assets/askmod-icon.svg" style="width:32px"></div><span class="typing"><i></i><i></i><i></i></span></div></div>`); await scrollChat(ty); await realSleep(850); ty.remove();
     const a=bot(f.a()); await scrollChat(a);
@@ -320,7 +293,7 @@ const idx=id=>STEPS.findIndex(s=>s.id===id);
 function label(){ $('#lbl').textContent=`${cur+1} / ${STEPS.length} · ${STEPS[cur].label}`; history.replaceState(null,'',location.pathname+location.search+'#'+STEPS[cur].id); updateHint(); }
 function reset(){
   st=S0(); msgs.innerHTML=''; scroller.scrollTop=0; hideCursor(); closeModal(); closeOv(); $('#toast').classList.remove('on');
-  renderResults(); selectResult(0,false); $('#t-doc').innerHTML=templatePage(); setStatus('review'); setView('DOC'); renderRedline();
+  renderResults(); $('#t-doc').innerHTML=templatePage(); setStatus('review'); setView('DOC'); renderRedline();
   $('#cin').value=''; document.body.classList.remove('chat-min','wide'); paintStars();
 }
 async function goTo(i){ const t=++TOKEN; ANIM=false; busy=false; advancing=false; freeBusy=false; document.body.classList.add('instant'); reset();
@@ -334,7 +307,7 @@ async function play(){ if(playing) return; playing=true; AUTOPLAY=true; $('#b-pl
   if(cur>=STEPS.length-1) await goTo(0);
   while(playing&&cur<STEPS.length-1){ await next(); await realSleep(1400); }
   playing=false; AUTOPLAY=false; hideCursor(); $('#b-play').textContent='Play'; updateHint(); }
-const HINTS={0:'#sg-main',3:'#why1',4:'#lnk-62',5:'#genie-btn',6:'#chip-open',7:'#cmp-btn',8:'#chip-fix',9:'#chip-apply',10:'#chip-approve',11:'#m-approve',12:'#back-queue',13:'#done-banner .btn'};
+const HINTS={0:'#sg-main',3:'#why-1',4:'#vp-1',5:'#show-gap',6:'#rd-9',7:'#cmp-btn',8:'#chip-fix',9:'#chip-apply',10:'#chip-approve',11:'#m-approve',12:'#back-queue',13:'#done-banner .btn'};
 function updateHint(){ $$('.hint').forEach(e=>e.classList.remove('hint')); if(busy||playing||advancing) return; const sel=HINTS[cur]; const el=sel&&$(sel); if(el&&el.offsetParent) el.classList.add('hint'); }
 
 /* ======================= header bits ======================= */
@@ -351,25 +324,46 @@ document.addEventListener('click',async e=>{
   if(!e.target.closest('.org-list,#org-dd')) $$('.org-list').forEach(x=>x.classList.remove('on'));
   if(!el) return;
   const a=el.dataset.act;
-  if(playing&&a!=='restart') return;
-  if((busy||advancing)&&!['dd-modes','menu','close-ov','close-modal','view','sel','wstep','cfilter','home','fullscreen'].includes(a)) return;
+  if(playing&&a!=='restart'&&a!=='logo') return;
+  if((busy||advancing)&&!['dd-modes','menu','close-ov','close-modal','view','sel','wstep','cfilter','fullscreen'].includes(a)) return;
   switch(a){
-    case 'home': show('home'); break;
+    case 'lm-why': { const n=+el.dataset.n; if(cur===3&&n===1) await advanceTo('reasoning'); else openWhy(n); break; }
+    case 'lm-pdf': { const n=+el.dataset.n; if(cur===4&&n===1) await advanceTo('citation'); else openPdf(n); break; }
+    case 'lm-pdf-x': openPdf(+el.dataset.n,false); break;
+    case 'lm-redline': { const n=+el.dataset.n; if(n===9){ if(cur===6) await advanceTo('open'); else { show('contract'); setView(cur>=8?'RL':'DOC'); } } else { const r=RES.find(x=>x.n===n); toast(`${r.cp} is already signed · this demo redlines CTR-2026-01184`); } break; }
+    case 'lm-compare': { const n=+el.dataset.n; if(n===9){ show('contract'); setView('TPL'); } else toast('Pick a second contract to compare with (demo)'); break; }
+    case 'lm-rate': toast('Thanks, your rating helps rank results'); break;
+    case 'lm-expand': { const n=+el.dataset.n; if(n===9){ show('contract'); setView(st.view); } else { const r=RES.find(x=>x.n===n); toast(`${r.id} · ${r.cp}`); } break; }
+    case 'lm-more': el.closest('.lm-ais').classList.toggle('more'); el.textContent=el.closest('.lm-ais').classList.contains('more')?'View less':'View more'; break;
+    case 'fav': el.classList.toggle('on'); el.style.color=el.classList.contains('on')?'#DB2777':''; toast(el.classList.contains('on')?'Added to favourites':'Removed from favourites'); break;
+    case 'lm-save': toast('Saved to the project “Vendor contracts FY27”'); break;
+    case 'lm-share': toast('Share link copied (demo)'); break;
+    case 'lm-sort': toast('Sorted by relevance score, highest first'); break;
+    case 'lm-filter': toast('Filters: 17 contracts · Services, Software, Facilities'); break;
+    case 'lm-cat': el.classList.toggle('off'); toast(`${el.dataset.c} ${el.classList.contains('off')?'hidden from':'shown in'} the results`); break;
+    case 'lm-coll': { const l=$('#lm-ci'); if(l){ const hid=l.style.display==='none'; l.style.display=hid?'':'none'; el.querySelector('svg').style.transform=hid?'rotate(180deg)':'rotate(0deg)'; } break; }
+    case 'lm-goto': { const n=+el.dataset.n; show('results'); const c=$('#lmc-'+n); await scrollList(c); c.classList.add('flash'); setTimeout(()=>c.classList.remove('flash'),1500); break; }
+    case 'lm-back': show('results'); break;
+    case 'show-gap': if(cur===5) await advanceTo('gap'); else { show('results'); const c=$('#lmc-9'); await scrollList(c); openWhy(9,true); } break;
+    case 'lm-gen': { const p=el.nextElementSibling; if(p) p.style.display=p.style.display==='none'?'':'none'; break; }
+    case 'gen': toast('Generate a contract is coming soon'); break;
+    case 'focus': $('#cin').focus(); break;
+    case 'ingest': toast('Contracts ingested: 1,248 · up to date'); break;
+    case 'home': closeOv(); closeModal(); document.body.classList.remove('chat-min','wide'); show('home'); break;
     case 'corpus': show('corpus'); break;
     case 'feat': { const f=el.dataset.f;
-      if(f==='search'){ if(cur===0) await advanceTo('results'); else show('search'); }
+      if(f==='search'){ if(cur===0) await advanceTo('results'); else show('results'); }
       else if(f==='corpus') show('corpus');
       else if(f==='redline'){ if(cur===6) await advanceTo('open'); else if(cur===7) await advanceTo('redline'); else { show('contract'); setView(cur>=8?'RL':'DOC'); } }
       else if(f==='compare'){ show('contract'); setView('TPL'); }
       else if(f==='compliance'){ show('contract'); setView('KEY'); }
       else toast('Generate a contract is coming soon');
       break; }
+    case 'logo': playing=false; AUTOPLAY=false; closeOv(); closeModal(); await goTo(0); break;
     case 'restart': playing=false; AUTOPLAY=false; closeOv(); closeModal(); await goTo(0); toast('Demo restarted'); break;
     case 'cfilter': st.filter=el.dataset.f; renderCorpus(); updateHint(); break;
     case 'row': { closeOv(); const id=el.dataset.id; if(id===MAIN){ if(cur===6) await advanceTo('open'); else { show('contract'); setView(st.view); } } else { const r=[...QUEUE,...EXEC].find(x=>x.id===id); toast(`${r.id} · ${r.title} · ${r.sum?r.sum.split('.')[0]:'matches its template'}`); } break; }
     case 'view': setView(el.dataset.v); break;
-    case 'sel': { if(screen!=='search') show('search'); const i=el.dataset.i==='low'?'low':+el.dataset.i; selectResult(i,cur>=5||(i==='low'&&cur>=6)); break; }
-    case 'pv-open': { const r=st.sel==='low'?LOW:SR[st.sel]; if(r.id===MAIN){ if(cur===6) await advanceTo('open'); else { show('contract'); setView('DOC'); } } else toast(`${r.id} · ${r.cp} · ${r.st}`); break; }
     case 'send': { const v=$('#cin').value.trim(); if(v) pulseSend();
       if(cur===0&&(!v||/45|payment|net|days/i.test(v))){ await advanceTo('results'); }
       else if(cur===6&&/redline|check|template|01184|kestrel|open/i.test(v)){ $('#cin').value=''; await advanceTo('open'); }
@@ -382,12 +376,6 @@ document.addEventListener('click',async e=>{
     case 'free': freeQA(el.dataset.q); break;
     case 'sugg': { const k=el.dataset.k; if(k==='main'){ if(cur===0) await advanceTo('results'); else freeQA(null,QUESTION); } else freeQA(k); break; }
     case 'ask-main': if(cur===0) advanceTo('results'); else freeQA('all6'); break;
-    case 'why': if(cur===3) await advanceTo('reasoning'); else { el.classList.toggle('open'); $('#xp').classList.toggle('on'); } break;
-    case 'citation': if(cur===4) await advanceTo('citation'); else { el.classList.toggle('open'); $('#vcite').classList.toggle('on'); show('search'); selectResult(0,true); } break;
-    case 'cite': { show('search'); selectResult(0,false); const p=[...$('#pv-doc').querySelectorAll('p')].find(x=>x.textContent.startsWith(el.dataset.c)); if(p){ const c=p.querySelector('.cl'); if(c){ c.classList.add('hl'); aimPaper(c);} } break; }
-    case 'genie': openGenie(); break;
-    case 'close-genie': closeModal(); if(cur===5) await advanceTo('gap'); break;
-    case 'genie-doc': closeModal(); if(cur===5) await advanceTo('gap'); else { show('search'); selectResult(0,true); } break;
     case 'wstep': el.classList.toggle('open'); break;
     case 'trace': toast('Trace: 5 steps · 1,248 contracts · 3,912 clauses'); break;
     case 'dl': toast('Downloads are turned off in this demo'); break;
@@ -445,7 +433,7 @@ document.addEventListener('click',async e=>{
     case 'attach': toast('Attach a contract (PDF or DOCX) · turned off in this demo'); break;
     case 'guide': toast('Guidelines: Vendor services template v4 is attached'); break;
     case 'cart': toast('Context: 1,248 contracts · 5 templates'); break;
-    case 'add': { const w=bot(`<p>What would you like to do?</p>${pills([['Search contracts','data-act="sugg" data-k="main"'],['Redline a contract','data-act="sugg" data-k="redline0"'],['Compare contracts','data-act="sugg" data-k="compare0"']])}`); scrollChat(w); break; }
+    case 'add': { const w=bot(`<p>What would you like to do?</p>${opts([['Search contracts','data-act="sugg" data-k="main"'],['Redline a contract','data-act="sugg" data-k="redline0"'],['Compare contracts','data-act="sugg" data-k="compare0"']])}`); scrollChat(w); break; }
     case 'speaker': { const on=!el.classList.contains('cx-on'); el.classList.toggle('cx-on',on); el.style.color=on?'#5928ED':''; toast(on?'Voice replies on':'Voice replies off'); break; }
     case 'mic': { if(el.classList.contains('cx-rec')) break; el.classList.add('cx-rec'); el.style.color='#5928ED';
       const q=cur===0?QUESTION:cur===7?'Compare it with our template':'Summarise this contract', cin=$('#cin'); cin.value='';
@@ -456,7 +444,7 @@ document.addEventListener('click',async e=>{
 });
 $('#ov-filter').addEventListener('click',e=>{ if(e.target.id==='ov-filter') closeOv(); });
 $('#ov-hamb').addEventListener('click',e=>{ if(e.target.id==='ov-hamb') closeOv(); });
-$('#modal-bg').addEventListener('click',async e=>{ if(e.target.id==='modal-bg'&&cur!==11){ closeModal(); updateHint(); if(cur===5) await advanceTo('gap'); } });
+$('#modal-bg').addEventListener('click',e=>{ if(e.target.id==='modal-bg'&&cur!==11){ closeModal(); updateHint(); } });
 $('#mode-search')?.addEventListener('input',e=>filterModes(e.target.value));
 $('#pj-search').addEventListener('input',renderProjects);
 $('#hist-search')?.addEventListener('input',e=>{ const q=e.target.value.toLowerCase(); $$('#ov-hamb .p-sidebar-content button, #ov-hamb .p-sidebar-content [class*="rounded"]').forEach(()=>{}); });
@@ -469,6 +457,7 @@ $('#b-play').onclick=()=>play();
 addEventListener('keydown',e=>{ if(e.target.matches('input,textarea,[contenteditable=true]')) return;
   if(e.key==='ArrowRight'){ if(!playing) next(); } else if(e.key==='ArrowLeft'){ playing=false; if(cur>0) goTo(cur-1); } else if(e.key===' '){ e.preventDefault(); play(); } else if(e.key==='Escape'){ closeOv(); closeModal(); } });
 
+{ const w=$('#scr-home h1'); const p=w&&w.nextElementSibling; if(p) p.insertAdjacentHTML('afterend','<p class="lm-ing">Contracts ingested: <b>1,248</b> <span data-act="ingest" title="Refresh">⟳</span></p>'); }
 const start=Math.max(0,idx(location.hash.slice(1)));
 (document.fonts?document.fonts.ready:Promise.resolve()).then(async()=>{ await goTo(start); if(P.has('play')) play(); });
 window.__goTo=goTo; window.__steps=STEPS.map(s=>s.id); window.__state=()=>({cur,screen,busy:busy||advancing,freeBusy});

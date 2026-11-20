@@ -18,6 +18,8 @@ for img in root.find_all('img'):
     if a in IMG: img['src'] = IMG[a]
 
 # ---------- header ----------
+logo = root.find('img', attrs={'alt': 'Techolution Logo'}).find_parent('div', class_='cursor-pointer')
+logo['data-act'] = 'logo'; logo['id'] = 'logo-home'; logo['title'] = 'Home'
 lab = root.select_one('.custom-header-dropdown .p-dropdown-label')
 lab.string = 'Contracts AI Mode'
 dd = root.select_one('.custom-header-dropdown'); dd['data-act'] = 'dd-modes'; dd['id'] = 'mode-dd'

@@ -14,6 +14,6 @@ leaves 2 legal calls to the attorney, and the contract is approved and sent for 
 
 - Click the highlighted control to move on, or use the **Guided demo** bar (◀ ▶ Play).
 - `?clean` hides the demo bar and hint rings (for screen recording). `?play` plays the whole flow.
-- `index.html#redline` (any step id) opens a step directly.
+- `index.html#redline` (any step id) opens a step directly. Click the Techolution logo to start over.
 
 All data is sample data. It is not a real agency, vendor or contract.
