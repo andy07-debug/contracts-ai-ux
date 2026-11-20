@@ -1,0 +1,76 @@
+<!-- ===== SEARCH ACROSS EVERY CONTRACT ===== -->
+<div class="scr" id="scr-search" style="height:100%">
+ <div class="cx">
+  <div class="cx-top"><a data-act="home">Contracts AI</a><span class="sep">/</span><span>Contract &amp; Clause Search</span></div>
+  <div class="srch-q"><svg><use href="#i-search"/></svg><span id="srq">Show me contracts with payment terms of 45 days or more.</span><span class="pill blue">All contracts · 1,248</span></div>
+  <div class="srch-meta"><span><b>6</b> matches</span><span><b>3,912</b> payment clauses read</span><span>Ranked by relevance</span><span><b>1.8 s</b></span></div>
+  <div class="srch-b">
+   <div class="sr-list" id="sr-list"></div>
+   <div class="card sr-prev" style="display:flex;flex-direction:column;overflow:hidden">
+    <div class="docbar"><span class="fi">PDF</span><b id="pv-name"></b><span id="pv-page"></span><span class="sp"></span><button data-act="pv-open">Open contract</button></div>
+    <div class="pdfbg" id="pv-bg"><div class="paperwrap" id="pv-wrap" style="width:100%;display:flex;justify-content:center"><div class="paper legal" id="pv-doc"></div></div></div>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- ===== CONTRACT + REDLINE ===== -->
+<div class="scr" id="scr-contract" style="height:100%">
+ <div class="cx">
+  <div class="cx-top"><a data-act="home">Contracts AI</a><span class="sep">/</span><a data-act="corpus">All contracts</a><span class="sep">/</span><span class="num">CTR-2026-01184</span></div>
+  <div class="ct-h">
+   <h2>Facilities maintenance services agreement</h2>
+   <div class="ct-pills"><span class="pill blue" id="status-pill"><span class="dot"></span>In legal review</span><span class="pill grey num" id="day-pill">Day 3 in review</span></div>
+   <div class="ct-meta"><span>Type <b>Vendor agreement</b></span><span>Counterparty <b>Kestrel Facility Services LLC</b></span><span>Value <b class="num">$1.2M · 3 years</b></span><span>Template <b>Vendor services v4</b></span></div>
+   <div class="ct-act"><button class="btn out sm" data-act="req-chg">Request changes</button><button class="btn pri sm" data-act="approve-hdr" id="approve-hdr">Approve</button></div>
+  </div>
+  <div class="ct-body"><div class="card">
+   <div class="tabs" id="tabs">
+    <div class="tab on" data-act="view" data-v="DOC"><svg class="bk" style="width:15px;height:15px"><use href="#i-doc"/></svg>Contract</div>
+    <div class="tab" data-act="view" data-v="RL" id="tab-rl"><svg class="bk" style="width:15px;height:15px;color:var(--blue)"><use href="#i-spark"/></svg>AI redline<span class="rev" id="rl-tag" style="display:none"></span></div>
+    <div class="tab" data-act="view" data-v="TPL"><svg class="bk" style="width:15px;height:15px"><use href="#i-book"/></svg>Our template</div>
+    <div class="tab" data-act="view" data-v="KEY"><svg class="bk" style="width:15px;height:15px"><use href="#i-layers"/></svg>Key terms</div>
+    <div class="tab" data-act="view" data-v="TIME"><svg class="bk" style="width:15px;height:15px"><use href="#i-clock"/></svg>Timeline</div>
+   </div>
+   <div class="view on" id="view-DOC">
+    <div class="docbar"><span class="fi">PDF</span><b>CTR-2026-01184_vendor-draft-v2.pdf</b><span>Page 1 of 18</span><span class="sp"></span><button data-act="dl">Download</button></div>
+    <div class="pdfbg"><div class="paper legal" id="c-doc"></div></div>
+   </div>
+   <div class="view" id="view-RL">
+    <div class="rl">
+     <div class="rl-h"><span class="t">Vendor draft v2</span><span class="s">compared with</span><span class="t" style="color:var(--blue)">Vendor services template v4</span><span class="s" id="rl-sub">· 46 clauses</span>
+      <span class="lg"><span class="lgd"><i style="background:var(--bad)"></i>High risk</span><span class="lgd"><i style="background:#E0A800"></i>Medium</span><span class="lgd"><i style="background:var(--ok)"></i>Fixed</span><span class="lgd"><i style="background:var(--blue)"></i>Your call</span></span></div>
+     <div class="rl-body" id="rl-body"></div>
+     <div class="rl-count" id="rl-count"></div>
+    </div>
+   </div>
+   <div class="view" id="view-TPL">
+    <div class="docbar"><span class="fi" style="background:var(--blue-soft);color:var(--blue)">TPL</span><b>Vendor services agreement · template v4</b><span>Gold standard · approved by Legal</span></div>
+    <div class="pdfbg"><div class="paper legal" id="t-doc"></div></div>
+   </div>
+   <div class="view" id="view-KEY"><div class="rpt" id="rpt-key"></div></div>
+   <div class="view" id="view-TIME"><div class="rpt" id="rpt-time"></div></div>
+  </div></div>
+ </div>
+</div>
+
+<!-- ===== CONTRACT CORPUS ===== -->
+<div class="scr" id="scr-corpus" style="height:100%">
+ <div class="cx" style="overflow:auto">
+  <div class="cx-top"><a data-act="home">Contracts AI</a><span class="sep">/</span><span>Contract Corpus Search</span></div>
+  <div class="cx-h" style="border:0;padding-bottom:0"><h2>All contracts</h2><p>1,248 contracts: 1,206 executed and 42 in legal review.</p></div>
+  <div class="banner" id="done-banner"><span class="ic"><svg><use href="#i-check"/></svg></span><div><b>CTR-2026-01184 reviewed in 5 minutes</b> and sent for signature. 9 deviations: 7 fixed by AI, 2 decided by you.</div><button class="btn out sm" data-act="restart"><svg style="width:14px;height:14px"><use href="#i-redo"/></svg>Restart demo</button></div>
+  <div class="fchips" id="c-chips"></div>
+  <div class="tbl" id="c-table"></div>
+  <div style="height:28px"></div>
+ </div>
+</div>
+
+<!-- ===== PROJECTS ===== -->
+<div class="scr" id="scr-projects" style="height:100%">
+ <div class="cx" style="overflow:auto">
+  <div class="cx-top"><a data-act="home">Contracts AI</a><span class="sep">/</span><span>Projects</span></div>
+  <div class="pj-tools"><input id="pj-search" placeholder="Search by name or by creator" autocomplete="off"><span class="pj-sel">Date: Newest First <svg style="width:14px;height:14px"><use href="#i-chev"/></svg></span><label style="display:inline-flex;gap:8px;align-items:center;font-size:13.5px;color:#4B5563"><input type="checkbox" id="pj-sub" style="width:16px;height:16px;accent-color:#5928ED">Show Sub Projects</label><button class="btn out sm" data-act="pj-new" style="margin-left:auto">+ New Project</button></div>
+  <div class="pj-grid" id="pj-grid"></div>
+ </div>
+</div>
