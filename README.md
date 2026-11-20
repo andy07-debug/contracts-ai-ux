@@ -1,5 +1,7 @@
 # Contracts AI · interactive demo
 
+**Live demo:** https://andy07-debug.github.io/contracts-ai-ux/
+
 A clickable prototype of **Contracts AI by Techolution**, an AI review assistant for contract and legal teams.
 Built on the same shell as the Permitting AI demo.
 
