@@ -2,6 +2,9 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const msgs=$('#msgs'), scroller=$('#msgscroll'), cursor=$('#cursor');
 const P=new URLSearchParams(location.search);
+/* fit like Chrome at 90%: on a laptop screen the whole page is scaled down a little (the same as Cmd -), never up */
+let Z=1; function fitZoom(){ const q=parseFloat(P.get('zoom')); Z=q>0?q:Math.min(1,Math.max(.75,innerWidth/1680)); document.documentElement.style.zoom=Z; document.documentElement.style.setProperty('--z',Z); }
+fitZoom(); addEventListener('resize',fitZoom);
 if(P.has('clean')) document.body.classList.add('clean');
 const ico=(id,cls)=>`<svg class="${cls||''}"><use href="#${id}"/></svg>`;
 const icoS=(id,px,color)=>`<svg style="width:${px}px;height:${px}px;${color?'color:'+color:''}"><use href="#${id}"/></svg>`;
@@ -23,7 +26,7 @@ let lastAim=-1e9;
 function scrollChat(el,mode){
   if(!el) return Promise.resolve(); lastAim=performance.now();
   const er=el.getBoundingClientRect(), mr=scroller.getBoundingClientRect();
-  const top=scroller.scrollTop+(er.top-mr.top), h=er.height;
+  const top=scroller.scrollTop+(er.top-mr.top)/Z, h=er.height/Z;
   const target=mode==='top'?Math.max(0,top-24):Math.max(0,top+h-scroller.clientHeight+24);
   return smoothScroll(scroller,target);
 }
@@ -32,7 +35,7 @@ function smoothScroll(box,target,dur=600){ if(!ANIM){box.scrollTop=target;return
   return new Promise(r=>{const f=now=>{const k=Math.min(1,(now-t0)/dur), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2; box.scrollTop=from+d*e; k<1?requestAnimationFrame(f):r();};requestAnimationFrame(f);}); }
 let cx=900, cy=700, AUTOPLAY=false;
 async function point(el){ if(!ANIM||!AUTOPLAY||P.has('nocursor')||!el) return; cursor.classList.add('on');
-  const r=el.getBoundingClientRect(), px=r.left+r.width/2, py=r.top+r.height/2, fx=cx, fy=cy, dur=700, t0=performance.now();
+  const r=el.getBoundingClientRect(), px=(r.left+r.width/2)/Z, py=(r.top+r.height/2)/Z, fx=cx, fy=cy, dur=700, t0=performance.now();
   await new Promise(res=>{const f=now=>{const k=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-k,3);cx=fx+(px-fx)*e;cy=fy+(py-fy)*e;cursor.style.transform=`translate(${cx-4}px,${cy-2}px)`;k<1?requestAnimationFrame(f):res();};requestAnimationFrame(f);});
   await sleep(220); }
 function hideCursor(){cursor.classList.remove('on');}
@@ -79,7 +82,7 @@ function selectResult(i,hl){ st.sel=i; const r=i==='low'?LOW:SR[i], d=DOCS[r.doc
   $('#pv-name').textContent=d.name; $('#pv-page').textContent=d.pg; $('#pv-doc').innerHTML=d.html(); $('#pv-wrap').style.transform='';
   if(hl){ const c=$('#'+d.hl); if(c){ c.classList.add(d.bad?'hlbad':'hl'); aimPaper(c); } } }
 function aimPaper(c){ const bg=$('#pv-bg'), wrap=$('#pv-wrap'); wrap.style.transition='none'; wrap.style.transform=''; void wrap.offsetHeight; wrap.style.transition='';
-  const off=c.getBoundingClientRect().top-wrap.getBoundingClientRect().top; const H=bg.clientHeight, ph=wrap.offsetHeight;
+  const off=(c.getBoundingClientRect().top-wrap.getBoundingClientRect().top)/Z; const H=bg.clientHeight, ph=wrap.offsetHeight;
   const y=Math.max(0,Math.min(off-H*0.35, ph-H+32)); if(!ANIM) wrap.style.transition='none'; wrap.style.transform=`translateY(${-y}px)`; if(!ANIM){ void wrap.offsetHeight; wrap.style.transition=''; } }
 
 /* contract views */
@@ -105,7 +108,7 @@ async function updDev(i,s,anim){ st.dev[i]=s; const old=$('#rlr'+i), html=rlRow(
   const d=document.createElement('div'); d.innerHTML=html; const el=d.firstElementChild;
   if(old) old.replaceWith(el); else { const body=$('#rl-body'); if(body.querySelector('.rl-empty')) body.innerHTML=''; const nxt=[...body.children].find(x=>+x.id.slice(3)>i); nxt?body.insertBefore(el,nxt):body.appendChild(el); }
   if(anim&&ANIM){ el.classList.add(s==='marked'?'mark-in':'flash'); const body=$('#rl-body'); const er=el.getBoundingClientRect(), br=body.getBoundingClientRect();
-    const top=body.scrollTop+(er.top-br.top); if(top+er.height>body.scrollTop+body.clientHeight-20||top<body.scrollTop) smoothScroll(body,Math.max(0,top-body.clientHeight/2+er.height/2),420); }
+    const top=body.scrollTop+(er.top-br.top)/Z, eh=er.height/Z; if(top+eh>body.scrollTop+body.clientHeight-20||top<body.scrollTop) smoothScroll(body,Math.max(0,top-body.clientHeight/2+eh/2),420); }
   renderCount(); const cd=$('#c-dv'+i); if(cd) cd.outerHTML=devSpan(i,'c'); }
 function renderKey(){ const fixed=st.status!=='review';
   $('#rpt-key').innerHTML=`<div class="rpt-h"><h2>Key terms</h2><span class="cdtag">Read by Contracts AI</span><span class="meta">${fixed?'After the redline':'From the vendor draft v2'}</span></div>
@@ -151,7 +154,7 @@ const STEPS=[
     if(ANIM && !typed){ await point(box); hideCursor(); box.focus();
       for(let i=1;i<=QUESTION.length;i++){guard(t); box.value=QUESTION.slice(0,i); await sleep(30+(QUESTION[i-1]===' '?22:0));}
       await sleep(300); await point($('#send')); await sleep(120); guard(t); }
-    box.value=''; box.blur(); hideCursor();
+    if(ANIM) pulseSend(); box.value=''; box.blur(); hideCursor();
     const u=user(q,'9:41 AM'); await scrollChat(u);
  }},
  {id:'working',label:'Searching every contract',run:async t=>{ await work(t,[
@@ -338,7 +341,7 @@ function updateHint(){ $$('.hint').forEach(e=>e.classList.remove('hint')); if(bu
 const starSvgs=()=>[...document.querySelectorAll('#feedback svg')].filter(s=>!s.closest('[class*="flame"]')).slice(0,5);
 function paintStars(){ starSvgs().forEach((s,i)=>s.classList.toggle('star-on',i<st.stars)); }
 starSvgs().forEach((s,i)=>{ s.style.cursor='pointer'; s.addEventListener('click',e=>{ e.stopPropagation(); st.stars=i+1; paintStars(); toast(`Thanks for rating Contracts AI ${i+1} of 5`); }); });
-function placeModes(){ const p=$('#ov-modes'), r=$('#mode-dd').getBoundingClientRect(); p.style.top=(r.bottom+6)+'px'; p.style.left=Math.max(12,r.left-20)+'px'; p.style.position='fixed'; }
+function placeModes(){ const p=$('#ov-modes'), r=$('#mode-dd').getBoundingClientRect(); p.style.top=(r.bottom/Z+6)+'px'; p.style.left=Math.max(12,r.left/Z-20)+'px'; p.style.position='fixed'; }
 function filterModes(q){ q=(q||'').toLowerCase(); $$('#ov-modes li').forEach(li=>li.style.display=!q||li.textContent.toLowerCase().includes(q)?'':'none'); }
 
 /* ======================= one click handler ======================= */
@@ -367,7 +370,7 @@ document.addEventListener('click',async e=>{
     case 'view': setView(el.dataset.v); break;
     case 'sel': { if(screen!=='search') show('search'); const i=el.dataset.i==='low'?'low':+el.dataset.i; selectResult(i,cur>=5||(i==='low'&&cur>=6)); break; }
     case 'pv-open': { const r=st.sel==='low'?LOW:SR[st.sel]; if(r.id===MAIN){ if(cur===6) await advanceTo('open'); else { show('contract'); setView('DOC'); } } else toast(`${r.id} · ${r.cp} · ${r.st}`); break; }
-    case 'send': { const v=$('#cin').value.trim();
+    case 'send': { const v=$('#cin').value.trim(); if(v) pulseSend();
       if(cur===0&&(!v||/45|payment|net|days/i.test(v))){ await advanceTo('results'); }
       else if(cur===6&&/redline|check|template|01184|kestrel|open/i.test(v)){ $('#cin').value=''; await advanceTo('open'); }
       else if(cur===7&&/compar|template|redline/i.test(v)){ $('#cin').value=''; await advanceTo('redline'); }
@@ -457,6 +460,8 @@ $('#modal-bg').addEventListener('click',async e=>{ if(e.target.id==='modal-bg'&&
 $('#mode-search')?.addEventListener('input',e=>filterModes(e.target.value));
 $('#pj-search').addEventListener('input',renderProjects);
 $('#hist-search')?.addEventListener('input',e=>{ const q=e.target.value.toLowerCase(); $$('#ov-hamb .p-sidebar-content button, #ov-hamb .p-sidebar-content [class*="rounded"]').forEach(()=>{}); });
+(function sendLoop(){ const v=!!$('#cin').value.trim(); $('#send').classList.toggle('ready',v); requestAnimationFrame(sendLoop); })();
+function pulseSend(){ const b=$('#send'); b.classList.remove('sent'); void b.offsetWidth; b.classList.add('sent'); setTimeout(()=>b.classList.remove('sent'),700); }
 $('#cin').addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); $('#send').click(); } });
 $('#b-next').onclick=()=>{ if(!playing&&!advancing) next(); };
 $('#b-prev').onclick=()=>{ playing=false; if(cur>0) goTo(cur-1); };

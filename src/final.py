@@ -21,6 +21,7 @@ css=open('shell.css').read()
 page=f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Contracts AI Mode · CW | Techolution</title>
+<script>(function(){{var q=parseFloat(new URLSearchParams(location.search).get('zoom'));var z=q>0?q:Math.min(1,Math.max(.75,innerWidth/1680));document.documentElement.style.zoom=z;document.documentElement.style.setProperty('--z',z);}})();</script>
 <meta name="description" content="Interactive demo of Contracts AI in the Techolution creative workspace (AppMod.AI). Sample data only.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
