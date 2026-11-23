@@ -9,11 +9,13 @@ projects and conversation history all work.
 Follow one question and one contract from search to signature:
 the attorney asks across every contract in plain language, the AI ranks the matching clauses,
 shows its reasoning and opens the exact clause, flags a draft that doesn't meet the term,
-redlines that draft against the gold-standard template (9 deviations by risk), fixes the 7 routine ones,
+opens Contracts Analysis and redlining: the AI suggests the best template to compare with (and says why), lines the
+draft up against it section by section, sorts the 9 deviations by risk with an explanation and a drafted fix for each,
+applies the 7 routine fixes as tracked changes,
 leaves 2 legal calls to the attorney, and the contract is approved and sent for signature.
 
 - Click the highlighted control to move on, or use the **Guided demo** bar (◀ ▶ Play).
 - `?clean` hides the demo bar and hint rings (for screen recording). `?play` plays the whole flow.
-- `index.html#redline` (any step id) opens a step directly. Click the Techolution logo to start over.
+- `index.html#compare` (any step id) opens a step directly. Click the Techolution logo to start over.
 
 All data is sample data. It is not a real agency, vendor or contract.

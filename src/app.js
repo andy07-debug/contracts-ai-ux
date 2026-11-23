@@ -46,12 +46,12 @@ let toastTimer; function toast(t){ $('#toast-t').textContent=t; $('#toast').clas
 /* ======================= state ======================= */
 const S0=()=>({genie:false,status:'review',sent:false,filter:'All',view:'DOC',sel:0,dev:DEVS.map(()=>'hidden'),choice:{cap:'2x',ins:'2m'},t:0,stars:0,org:'All organisations',recollect:false,ping:false});
 let st=S0();
-function clock(){ st.t++; const base=cur>=11?50:cur>=7?44:cur>=3?42:39; return `9:${String(Math.min(59,base+st.t)).padStart(2,'0')} AM`; }
+function clock(){ st.t++; const base=cur>=13?50:cur>=7?44:cur>=3?42:39; return `9:${String(Math.min(59,base+st.t)).padStart(2,'0')} AM`; }
 
 /* ======================= screens ======================= */
 let screen='home';
 function show(name){ screen=name; $$('#screens > .scr').forEach(s=>s.classList.toggle('on',s.id==='scr-'+name)); closeOv();
-  if(name==='corpus') renderCorpus(); if(name==='projects') renderProjects(); if(name!=='search'&&name!=='contract') document.body.classList.remove('wide'); updateHint(); }
+  if(name==='corpus') renderCorpus(); if(name==='projects') renderProjects(); if(name!=='search'&&name!=='contract'&&name!=='analysis') document.body.classList.remove('wide'); updateHint(); }
 function greet(){ return bot(`<p class="cxp"><b>Suggested Actions:</b></p><p class="cxp">Please select one of the options below to get started.</p>${opt('Search contracts','id="sg-main" data-act="sugg" data-k="main"')}${opt('Redline a contract','data-act="sugg" data-k="redline0"')}${opt('Compare contracts','data-act="sugg" data-k="compare0"')}${opt('Generate a contract','data-act="gen"')}${opt('Validate contract integrity','data-act="sugg" data-k="validate"')}${opt('Or, type your question below','data-act="focus"')}`,'9:38 AM'); }
 function renderSugg(){}
 function closeOv(){ ['#ov-menu','#ov-modes','#ov-filter','#ov-hamb'].forEach(s=>{const e=$(s); if(e) e.style.display='none';}); $$('.org-list').forEach(x=>x.classList.remove('on')); }
@@ -176,48 +176,7 @@ const STEPS=[
       <p style="margin-top:10px">Suggested next steps:</p>${opt('Redline CTR-2026-01184 against our template','id="chip-open" data-act="open-main"')}${opt('Show more of such contracts','data-act="free" data-q="more"')}`,'9:42 AM');
     await scrollChat(n,'top');
  }},
- {id:'open',label:'Contract opens',run:async t=>{
-    const c=$('#rd-9')||$('#chip-open'); if(ANIM&&c){await point(c); await sleep(120); guard(t);} hideCursor();
-    show('contract'); setView('DOC');
-    raw(`<div class="divider">Opened CTR-2026-01184</div>`);
-    const m=bot(`<p>This is a vendor draft of a <b>facilities maintenance services agreement</b> with Kestrel Facility Services: $1.2M over 3 years.</p><p style="margin-top:6px">It came in on the vendor’s own paper, so I’ll compare it with your <b>Vendor services template v4</b>, clause by clause.</p>
-      <div class="nchips"><span class="nchip go" id="cmp-btn" data-act="compare">${ico('i-spark')}Compare it with our template</span></div>`,'9:44 AM');
-    await scrollChat(m);
- }},
- {id:'redline',label:'AI redline',run:async t=>{
-    const b=$('#cmp-btn'); if(ANIM&&b){await point(b); await sleep(120); guard(t);} hideCursor(); if(b) b.classList.add('picked');
-    setView('RL'); renderRedline();
-    await analyzing(t,'AI Redlining',[['Read the vendor draft · <b>18 pages, 46 clauses</b>','Including Schedules A to C.','0.9'],['Matched each clause to your template · <b>Vendor services v4</b>','46 of 46 clauses paired, 2 renumbered.','0.6'],['Compared the wording clause by clause · <b>9 deviations</b>','37 clauses match the template.','1.2'],['Rated each deviation by risk · <b>4 high, 5 medium</b>','Risk to the Agency: money, liability, exit rights and jurisdiction.','0.8'],['Sorted routine fixes from legal calls · <b>7 routine, 2 for you</b>','Routine: the template already says what to do. Legal calls: a business trade-off.','0.7']],'4.2');
-    for(let i=0;i<DEVS.length;i++){ guard(t); await updDev(i,'marked',true); await sleep(240); }
-    const a=bot(`<p class="lead"><b>9 deviations</b> from your template: 4 high risk, 5 medium.</p>
-      <div class="devsum"><div class="dh">Routine · I can fix these to match the template<span class="n">7</span></div><ul>${DEVS.filter(d=>d.fix).map(d=>`<li><i style="background:${d.r==='high'?'var(--bad)':'#E0A800'}"></i>${d.n}<span>§ ${d.s}</span></li>`).join('')}</ul></div>
-      <div class="devsum"><div class="dh">Legal calls · these need you<span class="n">2</span></div><ul>${DEVS.filter(d=>d.you).map(d=>`<li><i style="background:${d.r==='high'?'var(--bad)':'#E0A800'}"></i>${d.n}<span>§ ${d.s}</span></li>`).join('')}</ul></div>
-      <div class="nchips"><span class="nchip go" id="chip-fix" data-act="fix">${ico('i-spark')}Fix the 7 routine ones</span><span class="nchip" data-act="free" data-q="all9">Show all 9</span></div>`,'9:46 AM');
-    await scrollChat(a,'top');
- }},
- {id:'autofix',label:'7 fixed, 2 left',run:async t=>{
-    const b=$('#chip-fix'); if(ANIM&&b){await point(b); await sleep(120); guard(t);} hideCursor(); if(b) b.classList.add('picked');
-    setView('RL'); setStatus('redline');
-    for(let i=0;i<DEVS.length;i++){ guard(t); await updDev(i,DEVS[i].fix?'fixed':'you',true); await sleep(DEVS[i].fix?420:200); }
-    const a=bot(`<p class="lead"><b>Fixed 7</b> to match your template. Every change is tracked in the redline.</p>
-      <ul class="fixlist">${DEVS.filter(d=>d.fix).map(d=>`<li>${tick}${d.fix}</li>`).join('')}</ul>
-      <div class="cnt-pill num"><span>9 deviations</span><span style="color:#9CA3AF;font-weight:600">→</span><span class="to">2 to review</span></div>
-      <div class="dec" id="dec"><div class="dh">${ico('i-scale')}2 calls for you</div>
-        ${DEVS.filter(d=>d.you).map(d=>{const c=CHOICES[d.you]; return `<div class="dr"><div class="dt">${d.n} · § ${d.s}<span class="risk ${d.r}"><i></i>${d.r==='high'?'High':'Medium'}</span></div>
-          <div class="rec">AI recommends: <b>${c.opts.find(o=>o[0]===c.rec)[1]}</b>, as in your template.</div>
-          <div class="opts">${c.opts.map(o=>`<span class="opt ${st.choice[d.you]===o[0]?'on':''}" data-act="choose" data-g="${d.you}" data-v="${o[0]}">${st.choice[d.you]===o[0]?ico('i-check'):''}${o[1]}</span>`).join('')}</div></div>`;}).join('')}
-        <div class="df"><button class="btn pri sm" id="chip-apply" data-act="apply">${ico('i-check')}Apply my decisions</button></div></div>`,'9:47 AM');
-    await scrollChat(a);
- }},
- {id:'decide',label:'Attorney decides',run:async t=>{
-    const b=$('#chip-apply'); if(ANIM&&b){await point(b); await sleep(150); guard(t);} hideCursor();
-    if(b){ b.disabled=true; b.classList.add('done'); b.innerHTML=ico('i-check')+'Applied'; } $$('#dec .opt').forEach(o=>o.classList.add('locked'));
-    for(let i=0;i<DEVS.length;i++){ if(DEVS[i].you){ guard(t); await updDev(i,'decided',true); await sleep(380); } }
-    setStatus('ready');
-    const a=bot(`<div class="allok"><div class="gh">${icoS('i-check',18)}Redline complete · 0 open deviations</div><p>7 fixed to match the template and 2 decided by you. Payment is now net 45, and the review took <b>5 minutes</b>.</p></div>
-      <div class="nchips"><span class="nchip go okc" id="chip-approve" data-act="approve">${ico('i-check')}Approve and send for signature</span><span class="nchip" data-act="dl">Download the redline</span></div>`,'9:48 AM');
-    await scrollChat(a,'top');
- }},
+ ...AN_STEPS, // comparison -> side by side -> review one -> fix one -> fix the rest -> decide (src/analysis.js)
  {id:'approve',label:'Attorney approves',run:async t=>{
     const c=$('#chip-approve'); if(ANIM&&c){await point(c); await sleep(120); guard(t);} hideCursor();
     modal(`<div class="mh"><span class="ic" style="background:var(--ok-soft);color:var(--ok)">${ico('i-check')}</span><h3>Approve CTR-2026-01184?</h3></div>
@@ -293,7 +252,7 @@ const idx=id=>STEPS.findIndex(s=>s.id===id);
 function label(){ $('#lbl').textContent=`${cur+1} / ${STEPS.length} · ${STEPS[cur].label}`; history.replaceState(null,'',location.pathname+location.search+'#'+STEPS[cur].id); updateHint(); }
 function reset(){
   st=S0(); msgs.innerHTML=''; scroller.scrollTop=0; hideCursor(); closeModal(); closeOv(); $('#toast').classList.remove('on');
-  renderResults(); $('#t-doc').innerHTML=templatePage(); setStatus('review'); setView('DOC'); renderRedline();
+  renderResults(); $('#t-doc').innerHTML=templatePage(); setStatus('review'); setView('DOC'); renderRedline(); anReset(); renderAn();
   $('#cin').value=''; document.body.classList.remove('chat-min','wide'); paintStars();
 }
 async function goTo(i){ const t=++TOKEN; ANIM=false; busy=false; advancing=false; freeBusy=false; document.body.classList.add('instant'); reset();
@@ -307,7 +266,8 @@ async function play(){ if(playing) return; playing=true; AUTOPLAY=true; $('#b-pl
   if(cur>=STEPS.length-1) await goTo(0);
   while(playing&&cur<STEPS.length-1){ await next(); await realSleep(1400); }
   playing=false; AUTOPLAY=false; hideCursor(); $('#b-play').textContent='Play'; updateHint(); }
-const HINTS={0:'#sg-main',3:'#why-1',4:'#vp-1',5:'#show-gap',6:'#rd-9',7:'#cmp-btn',8:'#chip-fix',9:'#chip-apply',10:'#chip-approve',11:'#m-approve',12:'#back-queue',13:'#done-banner .btn'};
+const HINTS={0:'#sg-main',3:'#why-1',4:'#vp-1',5:'#show-gap',6:'#rd-9',7:'#an-cmp:not([disabled]), #an-c1:not(.on)',8:'#sev-review',9:'#fix-this',10:'#chip-fix',11:'#chip-apply',12:'#chip-approve',13:'#m-approve',14:'#back-queue',15:'#done-banner .btn'};
+function showAn(){ show('analysis'); if(cur>=idx('compare')&&AN.mode!=='cmp'){ AN.mode='cmp'; } renderAn(); }
 function updateHint(){ $$('.hint').forEach(e=>e.classList.remove('hint')); if(busy||playing||advancing) return; const sel=HINTS[cur]; const el=sel&&$(sel); if(el&&el.offsetParent) el.classList.add('hint'); }
 
 /* ======================= header bits ======================= */
@@ -330,7 +290,7 @@ document.addEventListener('click',async e=>{
     case 'lm-why': { const n=+el.dataset.n; if(cur===3&&n===1) await advanceTo('reasoning'); else openWhy(n); break; }
     case 'lm-pdf': { const n=+el.dataset.n; if(cur===4&&n===1) await advanceTo('citation'); else openPdf(n); break; }
     case 'lm-pdf-x': openPdf(+el.dataset.n,false); break;
-    case 'lm-redline': { const n=+el.dataset.n; if(n===9){ if(cur===6) await advanceTo('open'); else { show('contract'); setView(cur>=8?'RL':'DOC'); } } else { const r=RES.find(x=>x.n===n); toast(`${r.cp} is already signed · this demo redlines CTR-2026-01184`); } break; }
+    case 'lm-redline': { const n=+el.dataset.n; if(n===9){ if(cur===6) await advanceTo('open'); else showAn(); } else { const r=RES.find(x=>x.n===n); toast(`${r.cp} is already signed · this demo redlines CTR-2026-01184`); } break; }
     case 'lm-compare': { const n=+el.dataset.n; if(n===9){ show('contract'); setView('TPL'); } else toast('Pick a second contract to compare with (demo)'); break; }
     case 'lm-rate': toast('Thanks, your rating helps rank results'); break;
     case 'lm-expand': { const n=+el.dataset.n; if(n===9){ show('contract'); setView(st.view); } else { const r=RES.find(x=>x.n===n); toast(`${r.id} · ${r.cp}`); } break; }
@@ -354,22 +314,24 @@ document.addEventListener('click',async e=>{
     case 'feat': { const f=el.dataset.f;
       if(f==='search'){ if(cur===0) await advanceTo('results'); else show('results'); }
       else if(f==='corpus') show('corpus');
-      else if(f==='redline'){ if(cur===6) await advanceTo('open'); else if(cur===7) await advanceTo('redline'); else { show('contract'); setView(cur>=8?'RL':'DOC'); } }
-      else if(f==='compare'){ show('contract'); setView('TPL'); }
+      else if(f==='redline'){ if(cur===6) await advanceTo('open'); else if(cur===7) await advanceTo('compare'); else showAn(); }
+      else if(f==='compare'){ if(cur===6) await advanceTo('open'); else if(cur===7) await advanceTo('compare'); else { if(cur<7){ AN.mode='pick'; } showAn(); } }
       else if(f==='compliance'){ show('contract'); setView('KEY'); }
       else toast('Generate a contract is coming soon');
       break; }
     case 'logo': playing=false; AUTOPLAY=false; closeOv(); closeModal(); await goTo(0); break;
     case 'restart': playing=false; AUTOPLAY=false; closeOv(); closeModal(); await goTo(0); toast('Demo restarted'); break;
     case 'cfilter': st.filter=el.dataset.f; renderCorpus(); updateHint(); break;
-    case 'row': { closeOv(); const id=el.dataset.id; if(id===MAIN){ if(cur===6) await advanceTo('open'); else { show('contract'); setView(st.view); } } else { const r=[...QUEUE,...EXEC].find(x=>x.id===id); toast(`${r.id} · ${r.title} · ${r.sum?r.sum.split('.')[0]:'matches its template'}`); } break; }
+    case 'row': { closeOv(); const id=el.dataset.id; if(id===MAIN){ if(cur===6) await advanceTo('open'); else showAn(); } else { const r=[...QUEUE,...EXEC].find(x=>x.id===id); toast(`${r.id} · ${r.title} · ${r.sum?r.sum.split('.')[0]:'matches its template'}`); } break; }
     case 'view': setView(el.dataset.v); break;
     case 'send': { const v=$('#cin').value.trim(); if(v) pulseSend();
       if(cur===0&&(!v||/45|payment|net|days/i.test(v))){ await advanceTo('results'); }
       else if(cur===6&&/redline|check|template|01184|kestrel|open/i.test(v)){ $('#cin').value=''; await advanceTo('open'); }
-      else if(cur===7&&/compar|template|redline/i.test(v)){ $('#cin').value=''; await advanceTo('redline'); }
-      else if(cur===8&&/fix/i.test(v)){ $('#cin').value=''; await advanceTo('autofix'); }
-      else if(cur===10&&/approve|sign/i.test(v)){ $('#cin').value=''; await advanceTo('approve'); }
+      else if(cur===7&&/compar|template|redline/i.test(v)){ $('#cin').value=''; await advanceTo('compare'); }
+      else if(cur===8&&/review|why|explain|payment|deep/i.test(v)){ $('#cin').value=''; await advanceTo('review'); }
+      else if(cur===9&&/fix/i.test(v)){ $('#cin').value=''; await advanceTo('fixone'); }
+      else if(cur===10&&/fix/i.test(v)){ $('#cin').value=''; await advanceTo('autofix'); }
+      else if(cur===12&&/approve|sign/i.test(v)){ $('#cin').value=''; await advanceTo('approve'); }
       else if(v){ $('#cin').value=''; const key=/summar/i.test(v)?'summary':/date|deadline/i.test(v)?'dates':/renew/i.test(v)?'renew':/review|queue/i.test(v)?'corpus':/deviation/i.test(v)?'all9':null; freeQA(key,v); }
       else $('#cin').focus();
       break; }
@@ -379,29 +341,29 @@ document.addEventListener('click',async e=>{
     case 'wstep': el.classList.toggle('open'); break;
     case 'trace': toast('Trace: 5 steps · 1,248 contracts · 3,912 clauses'); break;
     case 'dl': toast('Downloads are turned off in this demo'); break;
-    case 'open-main': closeOv(); if(cur===6) await advanceTo('open'); else { show('contract'); setView('DOC'); } break;
+    case 'open-main': closeOv(); if(cur===6) await advanceTo('open'); else showAn(); break;
     case 'open-tpl': show('contract'); setView('TPL'); break;
-    case 'compare': if(cur===7) await advanceTo('redline'); else { show('contract'); setView('RL'); } break;
-    case 'fix': if(cur===8) await advanceTo('autofix'); break;
+    case 'compare': if(cur===7) await advanceTo('compare'); else showAn(); break;
+    case 'fix': if(cur===10) await advanceTo('autofix'); else if(cur===8||cur===9) toast('Review the high-risk ones first: start with Payment terms'); break;
     case 'choose': { if(el.classList.contains('locked')) break; const g=el.dataset.g; st.choice[g]=el.dataset.v; el.parentElement.querySelectorAll('.opt').forEach(o=>{ const on=o.dataset.v===st.choice[g]; o.classList.toggle('on',on); o.innerHTML=(on?ico('i-check'):'')+CHOICES[g].opts.find(x=>x[0]===o.dataset.v)[1]; }); break; }
-    case 'apply': if(cur===9) await advanceTo('decide'); break;
-    case 'approve': if(cur===10) await advanceTo('approve'); else if(cur>=11) toast('This contract is already approved'); break;
-    case 'send-sign': if(cur===11) await advanceTo('sent'); break;
+    case 'apply': if(cur===11) await advanceTo('decide'); break;
+    case 'approve': if(cur===12) await advanceTo('approve'); else if(cur>=13) toast('This contract is already approved'); break;
+    case 'send-sign': if(cur===13) await advanceTo('sent'); break;
     case 'close-modal': closeModal(); updateHint(); break;
-    case 'back-queue': if(cur===12) await advanceTo('done'); else show('corpus'); break;
+    case 'back-queue': if(cur===14) await advanceTo('done'); else show('corpus'); break;
     case 'view-sum': modal(`<div class="cb"><div class="ct"><div><h2>Review summary</h2><small class="num">CTR-2026-01184 · Nov 20, 2026</small></div><div class="seal">REVIEWED<br>SAMPLE<br>CONTRACT</div></div>
         <div class="grid"><div><span>Contract</span><b>Facilities maintenance services agreement</b></div><div><span>Counterparty</span><b>Kestrel Facility Services LLC</b></div><div><span>Checked against</span><b>Vendor services template v4</b></div><div><span>Deviations</span><b>9 found · 7 fixed by AI · 2 decided</b></div><div><span>Payment terms</span><b>Net 45</b></div><div><span>Review time</span><b>5 minutes</b></div></div>
         <div class="cond"><b>Changes sent to the vendor.</b> ${DEVS.filter(d=>d.fix).map(d=>d.fix).join(' · ')} · ${CHOICES.cap.tag[st.choice.cap]} · ${CHOICES.ins.tag[st.choice.ins]}.</div></div>
         <div class="mf"><button class="btn out" data-act="dl">Download redline</button><button class="btn pri" data-act="close-modal">Close</button></div>`,true); break;
-    case 'req-chg': if(cur<8) toast('Run the AI redline first, so the changes are tracked'); else if(cur<11) toast('The redline already holds every change for the vendor'); else toast('This contract is already out for signature'); break;
+    case 'req-chg': if(cur<8) toast('Run the AI redline first, so the changes are tracked'); else if(cur<13) toast('The redline already holds every change for the vendor'); else toast('This contract is already out for signature'); break;
     case 'approve-hdr':
-      if(cur===10) await advanceTo('approve');
-      else if(cur>=11) toast('This contract is already approved');
+      if(cur===12) await advanceTo('approve');
+      else if(cur>=13) toast('This contract is already approved');
       else modal(`<div class="mh"><span class="ic" style="background:var(--warn-soft);color:var(--warn)">${ico('i-alert')}</span><h3>Not ready to approve</h3></div>
         <div class="mb">${cur<8?'This draft has <b>9 open deviations</b> from your template, 4 of them high risk. Compare it with the template first.':'<b>2 deviations</b> still need your call: limitation of liability and insurance.'}</div>
         <div class="mf"><button class="btn out" data-act="close-modal">Close</button>${cur===7?'<button class="btn pri" data-act="m-compare">Compare with our template</button>':''}</div>`);
       break;
-    case 'm-compare': closeModal(); if(cur===7) await advanceTo('redline'); break;
+    case 'm-compare': closeModal(); if(cur===7) await advanceTo('compare'); break;
     /* --- the real AppMod.AI shell controls --- */
     case 'projects': show('projects'); break;
     case 'pj-open': { const p=el.dataset.p; if(/Vendor contracts|Facilities/.test(p)) { show('corpus'); toast('Opened project · '+p); } else toast('Opened project · '+p+' (sample)'); break; }
@@ -444,7 +406,7 @@ document.addEventListener('click',async e=>{
 });
 $('#ov-filter').addEventListener('click',e=>{ if(e.target.id==='ov-filter') closeOv(); });
 $('#ov-hamb').addEventListener('click',e=>{ if(e.target.id==='ov-hamb') closeOv(); });
-$('#modal-bg').addEventListener('click',e=>{ if(e.target.id==='modal-bg'&&cur!==11){ closeModal(); updateHint(); } });
+$('#modal-bg').addEventListener('click',e=>{ if(e.target.id==='modal-bg'&&cur!==13){ closeModal(); updateHint(); } });
 $('#mode-search')?.addEventListener('input',e=>filterModes(e.target.value));
 $('#pj-search').addEventListener('input',renderProjects);
 $('#hist-search')?.addEventListener('input',e=>{ const q=e.target.value.toLowerCase(); $$('#ov-hamb .p-sidebar-content button, #ov-hamb .p-sidebar-content [class*="rounded"]').forEach(()=>{}); });

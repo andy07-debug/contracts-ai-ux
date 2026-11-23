@@ -2572,6 +2572,146 @@ ol.ans > li{margin-bottom:10px}
 .pdfpage .cl.hlbad{background:#FFD2D7;box-shadow:none}
 .pdfpage .dstamp{font-size:11px;right:0;top:0}
 </style>
+<style>/* ======================= Contracts Analysis and redlining ======================= */
+.an .lm-top h2{font-size:17px}
+.an-exp{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border:1px solid #E5E7EB;border-radius:8px;background:#F9FAFB;color:#374151;font:500 14px Inter;cursor:pointer;white-space:nowrap}
+.an-exp svg{width:16px;height:16px}
+.an-exp:hover{background:#F3F4F6}
+.an-body{flex:1;min-height:0;display:flex;flex-direction:column;gap:14px;padding:16px 22px 18px;background:#fff;overflow:hidden}
+/* the picker: templates and similar contracts */
+.an-pk{border:1px solid #E5E7EB;border-radius:12px;background:#F9FAFB;flex:none}
+.an-pkbar{display:flex;align-items:center;justify-content:center;gap:8px;height:42px;font:500 14px Inter;color:#111827;cursor:pointer}
+.an-pkbar svg{width:16px;height:16px;color:#6B7280;transition:transform .25s}
+.an-pk:not(.min) .an-pkbar svg{transform:rotate(180deg)}
+.an-pk.min .an-pkb{display:none}
+.an-pkb{padding:14px 16px 16px}
+.an-pk .an-pkbar+.an-pkb{border-top:1px solid #E5E7EB}
+.an-pkh{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.an-pkh>div{flex:1}
+.an-pkh b{display:block;font:500 14.5px Inter;color:#111827}
+.an-pkh small{display:block;margin-top:3px;font:400 13.5px Inter;color:#4B5563}
+.an-cmp{height:36px;padding:0 18px;border-radius:8px;border:1px solid #D1D5DB;background:#E5E7EB;color:#6B7280;font:500 14px Inter;cursor:not-allowed;transition:background .25s,color .25s,box-shadow .25s}
+.an-cmp:not([disabled]){background:var(--blue);border-color:var(--blue);color:#fff;cursor:pointer;box-shadow:0 0 0 4px rgba(89,40,237,.14)}
+.an-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.an-card{position:relative;background:#fff;border:1.5px solid #E5E7EB;border-radius:10px;padding:12px 14px 12px;cursor:pointer;transition:border-color .2s,box-shadow .2s}
+.an-card:hover{border-color:#C4B5FD}
+.an-card.on{border-color:var(--blue);box-shadow:0 0 0 3px rgba(89,40,237,.12)}
+.an-ct{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.an-kind{display:inline-flex;align-items:center;gap:5px;font:500 12px Inter;color:#5B21B6;background:#F5F3FF;border-radius:6px;padding:3px 8px}
+.an-kind.sim{color:#1D4ED8;background:#EFF6FF}
+.an-kind svg{width:13px;height:13px}
+.an-rad{width:18px;height:18px;border-radius:50%;border:2px solid #A5B4FC;display:inline-block;position:relative}
+.an-card.on .an-rad{border-color:var(--blue)}
+.an-card.on .an-rad::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--blue)}
+.an-cn{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.an-cn b{font:600 14px Inter;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.an-simp{flex:none;font:500 12px Inter;color:var(--ok);background:var(--ok-soft);border-radius:6px;padding:2px 7px}
+.an-card p{margin:6px 0 8px;font:400 13px/1.45 Inter;color:#4B5563;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.an-why{display:inline-flex;align-items:center;gap:6px;font:400 12.5px Inter;color:#1D4ED8;border-top:1px dashed #E5E7EB;padding-top:8px;width:100%}
+.an-ds{display:inline-flex;align-items:center;gap:3px;border:1px solid #93C5FD;border-radius:999px;padding:1px 7px;color:#1D4ED8;font-weight:500}
+.an-ds svg,.an-ds img{width:13px;height:13px}
+.an-wl{display:none;margin:6px 0 0;padding-left:18px;font:400 12.5px/1.5 Inter;color:#374151}
+.an-wl.on{display:block}
+/* the uploaded contract */
+.an-doc{flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden}
+.an-dh{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #E5E7EB;font:400 13.5px Inter;color:#374151;background:#fff}
+.an-dh b{font-weight:600;color:#111827}
+.an-dh svg{width:16px;height:16px}
+.an-pg{font:500 12.5px Inter;color:#374151}
+.an-z{width:22px;text-align:center;color:#6B7280;font-size:16px}
+.an-doc .pdfbg{overflow:auto;align-items:flex-start;background:#EEF1F5}
+/* side-by-side comparison */
+.an-tools{display:flex;justify-content:flex-end;margin:-4px 0 -6px}
+.an-filt{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:1px solid #E5E7EB;border-radius:8px;font:500 13px Inter;color:#374151;cursor:pointer;background:#fff}
+.an-filt svg{width:14px;height:14px}
+.an-cmpv{flex:1;min-height:0;display:flex;flex-direction:column}
+.an-hd,.an-row{display:grid;grid-template-columns:minmax(0,1fr) 112px minmax(0,1fr);align-items:stretch}
+.an-hd{margin-bottom:8px}
+.an-col{display:flex;align-items:center;gap:8px;padding:11px 14px;border:1px dashed #CBD5E1;border-radius:10px;background:#F8FAFC;font:400 13px Inter;color:#6B7280;min-width:0}
+.an-col b{font:600 14.5px Inter;color:#111827;white-space:nowrap}
+.an-col b.bl{color:var(--blue)}
+.an-col small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.an-col svg{width:16px;height:16px;flex:none;color:#374151}
+.an-col.r{border-style:solid;border-color:#E5E7EB;background:#fff}
+.an-mid{display:flex;align-items:center;justify-content:center;position:relative}
+.an-mid::before{content:'';position:absolute;left:0;right:0;top:50%;border-top:1px dashed #CBD5E1;z-index:0}
+.an-hd .an-mid::before{border-top-style:solid;border-color:#C4B5FD}
+.an-lk{position:relative;z-index:1;display:inline-flex;align-items:center;gap:4px;font:500 11.5px Inter;border-radius:999px;padding:3px 9px;background:#fff;border:1px solid;white-space:nowrap}
+.an-lk svg{width:12px;height:12px}
+.an-lk.nd{color:#15803D;border-color:#86EFAC;background:#F0FDF4}
+.an-lk.high{color:#B91C1C;border-color:#FCA5A5;background:#FEF2F2}
+.an-lk.med{color:#B45309;border-color:#FCD34D;background:#FFFBEB}
+.an-lk.low{color:#1D4ED8;border-color:#93C5FD;background:#EFF6FF}
+.an-lk.ok{color:#15803D;border-color:#86EFAC;background:#F0FDF4}
+.an-lk.you{color:var(--blue);border-color:#C4B5FD;background:var(--blue-soft)}
+.an-lk.tot{color:var(--blue);border-color:#C4B5FD;background:#fff;font-size:12px}
+.an-rows{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:2px 2px 14px}
+.an-row .an-sec{border:1px solid #E5E7EB;border-radius:10px;background:#fff;min-width:0;transition:border-color .3s,box-shadow .3s,background .3s}
+.an-row:not(.nd) .an-sec:first-child{border-style:dashed;border-color:#CBD5E1}
+.an-sh{display:flex;align-items:center;gap:8px;padding:10px 14px}
+.an-sh b{font:600 14px Inter;color:#111827}
+.an-sh small{font:400 12px Inter;color:#9CA3AF}
+.an-sh svg{width:15px;height:15px;margin-left:auto;color:#6B7280}
+.an-row.dv .an-sh svg{transform:rotate(180deg)}
+.an-sec p{margin:0;padding:0 14px 12px;font:400 13.5px/1.6 "Source Serif 4",Georgia,serif;color:#1F2937}
+.an-hl{background:#FDE2E2;box-shadow:0 0 0 1px #FDE2E2;border-radius:2px}
+.an-hl.ok{background:#DCFCE7;box-shadow:0 0 0 1px #DCFCE7}
+.an-hl.kept{background:#EDE9FE;box-shadow:0 0 0 1px #EDE9FE}
+.an-tc s{color:#B91C1C;text-decoration-thickness:1.5px;background:#FEF2F2}
+.an-tc ins{color:#15803D;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:2px;background:#F0FDF4}
+.an-row.focus .an-sec{border-color:var(--blue)!important;border-style:solid!important;box-shadow:0 0 0 3px rgba(89,40,237,.14)}
+.an-row.ok .an-sec:first-child{border-color:#86EFAC;border-style:solid;background:#FCFFFD}
+.an-row.mark-in{animation:anIn .45s cubic-bezier(.2,.7,.2,1) both}
+.an-row.flash .an-sec:first-child{animation:anFl 1.1s ease-out}
+@keyframes anIn{from{opacity:.35;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes anFl{0%{background:#DCFCE7}100%{background:#FCFFFD}}
+body.instant .an-row{animation:none!important}
+/* the severity panel in chat */
+.sv{margin-top:10px;border:1.5px solid #E5E7EB;border-radius:12px;overflow:hidden;background:#fff}
+.sv-g+.sv-g{border-top:1px solid #E5E7EB}
+.sv-gh{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer}
+.sv-gh b{font:500 14px Inter}
+.sv-g.high .sv-gh b{color:#C81E2A}.sv-g.med .sv-gh b{color:#B45309}.sv-g.low .sv-gh b{color:#15803D}
+.sv-gh>svg{width:15px;height:15px;margin-left:auto;color:#6B7280}
+.sv-rev{margin-left:auto;font:500 12.5px Inter;color:#fff;background:var(--blue);border-radius:6px;padding:4px 10px;cursor:pointer}
+.sv-gb{display:none;padding:0 12px 10px}
+.sv-g.open .sv-gb{display:block}
+.sv-it{border-radius:8px}
+.sv-r{display:flex;align-items:center;gap:6px;padding:6px 4px}
+.sv-t{flex:1;min-width:0;font:400 13.5px Inter;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-t small{color:#9CA3AF}
+.sv-hand{display:inline-flex;opacity:.7}.sv-hand svg,.sv-hand img{width:14px;height:14px}
+.sv-fix{font:500 12px Inter;color:#fff;background:var(--blue);border-radius:5px;padding:2px 9px;cursor:pointer}
+.sv-ok{display:inline-flex;align-items:center;gap:4px;font:500 12px Inter;color:var(--ok)}.sv-ok svg{width:13px;height:13px}
+.sv-you{font:500 12px Inter;color:var(--blue)}
+.sv-go{display:inline-flex;color:var(--blue);cursor:pointer}.sv-go svg{width:15px;height:15px}
+.sv-it.done .sv-t{color:#6B7280}
+.sv-ex{margin:4px 2px 8px;border:1px solid #E5E7EB;border-radius:10px;padding:10px 12px;background:#fff}
+.sv-exh{display:flex;align-items:center;font:500 13.5px Inter;color:#111827}
+.sv-exh svg{width:14px;height:14px;margin-left:auto;transform:rotate(180deg);color:#6B7280}
+.sv-ex ol{margin:8px 0 10px;padding-left:20px;font:400 13px/1.55 Inter;color:#374151}
+.sv-fixthis{display:inline-flex;align-items:center;gap:6px;font:500 12.5px Inter;color:var(--blue);background:var(--blue-soft);border:1px solid var(--blue-line);border-radius:6px;padding:4px 10px;cursor:pointer}
+.sv-done{display:flex;align-items:center;gap:6px;font:500 12.5px Inter;color:var(--ok);background:var(--ok-soft);border:1px solid var(--ok-line);border-radius:6px;padding:5px 10px}
+.sv-done svg{width:14px;height:14px}
+.sv-cd{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid #F1F2F4;font:500 12.5px Inter;color:#111827}
+.sv-cd>span:first-child{display:inline-flex;align-items:center;gap:5px}.sv-cd svg,.sv-cd img{width:14px;height:14px}
+.sv-dstr{display:inline-flex;align-items:center;gap:4px;color:var(--blue);border:1px solid var(--blue-line);border-radius:999px;padding:2px 8px;font-size:12px}
+.sv-acc{display:grid;grid-template-columns:32px 1fr 16px;align-items:center;gap:8px;padding:8px 2px;border-top:1px solid #F1F2F4;cursor:pointer}
+.sv-acc .ic{width:30px;height:30px;border-radius:50%;display:grid;place-items:center}
+.sv-acc .ic.y{background:#FEF9C3;color:#A16207}.sv-acc .ic.b{background:#EFF6FF;color:#1D4ED8}
+.sv-acc .ic svg{width:15px;height:15px}
+.sv-acc b{display:block;font:500 13px Inter;color:#111827}.sv-acc small{font:400 11.5px Inter;color:#6B7280}
+.sv-acc>svg{width:15px;height:15px;color:#6B7280}
+.sv-ab{display:none;grid-column:1/-1;font:400 12.5px/1.5 Inter;color:#374151;padding:2px 4px 4px 40px}
+.sv-acc.open .sv-ab{display:block}.sv-acc.open>svg{transform:rotate(180deg)}
+.sv-ex ol{list-style:decimal}
+.an-cn{align-items:flex-start}
+.an-cn b{white-space:normal;overflow:visible;line-height:1.3}
+.an-wl{list-style:disc}
+.an-row.you.flash .an-sec:first-child{animation:anFlY 1.1s ease-out}
+@keyframes anFlY{0%{background:#EDE7FF}100%{background:#fff}}
+.an-row.you .an-sec:first-child{border-color:#C4B5FD;border-style:solid}
+</style>
 </head>
 <body><div id="root"><div style="display: contents;"><div class="flex flex-col w-full h-screen font-sans"><div class="w-full h-20"><div class="w-full h-full pointer-events-auto py-4 px-5 flex justify-start items-center gap-x-5 border-b border-b-[#E5E7EB]" style="background-color: rgb(255, 255, 255);"><div class="w-[30%] min-w-fit flex items-center gap-x-4"><div class="flex flex-col w-fit"><div class="flex space-x-4 items-center cursor-pointer" data-act="logo" id="logo-home" title="Home"><div class="max-h-8"><img alt="Techolution Logo" class="max-h-8 w-auto object-contain" src="assets/techolution-logo.svg" style="width: auto; height: auto;"/></div><div class="max-h-8"><img alt="Creative Workspace Logo" class="max-h-8 w-auto object-contain" src="assets/cw-logo.svg" style="width: auto; height: auto;"/></div></div><span class="text-xs font-normal font-sans text-right" style="color: rgb(0, 0, 0);">AI Powered Insights</span></div></div><div class="w-[70%] flex flex-row justify-between items-center"><div class="flex gap-2"><div class="custom-header-dropdown pointer-events-auto h-10 border border-[#D1D5DB] rounded-[6px] text-sm p-dropdown p-component p-inputwrapper p-inputwrapper-filled" data-act="dd-modes" data-cw-track="mode_dropdown_opened" data-p-disabled="false" data-p-focus="false" data-pc-name="dropdown" data-pc-section="root" id="mode-dd"><div class="p-hidden-accessible" data-pc-section="hiddenselectedmessage"><input aria-haspopup="listbox" aria-label="select mode" data-pc-section="input" readonly="" tabindex="0" type="text" value="Contract Intelligence Mode"/></div><div class="p-hidden-accessible p-dropdown-hidden-select" data-pc-section="hiddenselectedmessage"><select data-pc-section="select" tabindex="-1"><option data-pc-section="option" selected="" value="11">Contract Intelligence Mode</option></select></div><span class="p-dropdown-label p-inputtext" data-pc-section="input" tabindex="-1">Contracts AI Mode</span><div aria-expanded="false" aria-haspopup="listbox" aria-label="Select Mode" class="p-dropdown-trigger" data-pc-section="trigger" role="button"><svg class="p-icon p-dropdown-trigger-icon p-clickable" data-pc-section="dropdownicon" data-pr-overlay-visible="false" fill="none" height="14" viewbox="0 0 14 14" width="14" xmlns="http://www.w3.org/2000/svg"><path d="M7.01744 10.398C6.91269 10.3985 6.8089 10.378 6.71215 10.3379C6.61541 10.2977 6.52766 10.2386 6.45405 10.1641L1.13907 4.84913C1.03306 4.69404 0.985221 4.5065 1.00399 4.31958C1.02276 4.13266 1.10693 3.95838 1.24166 3.82747C1.37639 3.69655 1.55301 3.61742 1.74039 3.60402C1.92777 3.59062 2.11386 3.64382 2.26584 3.75424L7.01744 8.47394L11.769 3.75424C11.9189 3.65709 12.097 3.61306 12.2748 3.62921C12.4527 3.64535 12.6199 3.72073 12.7498 3.84328C12.8797 3.96582 12.9647 4.12842 12.9912 4.30502C13.0177 4.48162 12.9841 4.662 12.8958 4.81724L7.58083 10.1322C7.50996 10.2125 7.42344 10.2775 7.32656 10.3232C7.22968 10.3689 7.12449 10.3944 7.01744 10.398Z" fill="currentColor"></path></svg></div></div></div><div class="flex justify-end items-center gap-x-3"><div class="flex items-stretch gap-3"><div class="cw-header-feedback-card" id="feedback"><div aria-expanded="false" class="cw-header-feedback-trigger"><span><button class="cw-header-feedback-open" type="button"><strong>Help us Help you!</strong></button><div class="cw-header-feedback-rating-actions"><div aria-label="Rate a feature" class="cw-feedback-stars" role="radiogroup" style="--cw-feedback-accent: #5925DC; --cw-feedback-star-empty: #5925DC; gap: 5px; margin-top: 2px;"><button aria-checked="false" aria-label="1 star" role="radio" style="width: 18px; height: 18px; flex: 0 0 18px; --cw-feedback-star-button-color: inherit;" type="button"><svg aria-hidden="true" fill="none" style="pointer-events: none;" viewbox="0 0 20 20"><path d="M10.0003 2.5L12.2503 7.16667L17.3337 7.91667L13.667 11.5L14.5003 16.5833L10.0003 14.1667L5.50033 16.5833L6.33366 11.5L2.66699 7.91667L7.75033 7.16667L10.0003 2.5Z" stroke="#5925DC" stroke-linejoin="round" stroke-width="1.33333"></path></svg></button><button aria-checked="false" aria-label="2 stars" role="radio" style="width: 18px; height: 18px; flex: 0 0 18px; --cw-feedback-star-button-color: inherit;" type="button"><svg aria-hidden="true" fill="none" style="pointer-events: none;" viewbox="0 0 20 20"><path d="M10.0003 2.5L12.2503 7.16667L17.3337 7.91667L13.667 11.5L14.5003 16.5833L10.0003 14.1667L5.50033 16.5833L6.33366 11.5L2.66699 7.91667L7.75033 7.16667L10.0003 2.5Z" stroke="#5925DC" stroke-linejoin="round" stroke-width="1.33333"></path></svg></button><button aria-checked="false" aria-label="3 stars" role="radio" style="width: 18px; height: 18px; flex: 0 0 18px; --cw-feedback-star-button-color: inherit;" type="button"><svg aria-hidden="true" fill="none" style="pointer-events: none;" viewbox="0 0 20 20"><path d="M10.0003 2.5L12.2503 7.16667L17.3337 7.91667L13.667 11.5L14.5003 16.5833L10.0003 14.1667L5.50033 16.5833L6.33366 11.5L2.66699 7.91667L7.75033 7.16667L10.0003 2.5Z" stroke="#5925DC" stroke-linejoin="round" stroke-width="1.33333"></path></svg></button><button aria-checked="false" aria-label="4 stars" role="radio" style="width: 18px; height: 18px; flex: 0 0 18px; --cw-feedback-star-button-color: inherit;" type="button"><svg aria-hidden="true" fill="none" style="pointer-events: none;" viewbox="0 0 20 20"><path d="M10.0003 2.5L12.2503 7.16667L17.3337 7.91667L13.667 11.5L14.5003 16.5833L10.0003 14.1667L5.50033 16.5833L6.33366 11.5L2.66699 7.91667L7.75033 7.16667L10.0003 2.5Z" stroke="#5925DC" stroke-linejoin="round" stroke-width="1.33333"></path></svg></button><button aria-checked="false" aria-label="5 stars" role="radio" style="width: 18px; height: 18px; flex: 0 0 18px; --cw-feedback-star-button-color: inherit;" type="button"><svg aria-hidden="true" fill="none" style="pointer-events: none;" viewbox="0 0 20 20"><path d="M10.0003 2.5L12.2503 7.16667L17.3337 7.91667L13.667 11.5L14.5003 16.5833L10.0003 14.1667L5.50033 16.5833L6.33366 11.5L2.66699 7.91667L7.75033 7.16667L10.0003 2.5Z" stroke="#5925DC" stroke-linejoin="round" stroke-width="1.33333"></path></svg></button></div></div></span></div><button aria-label="Leaderboard coming soon" class="cw-header-feedback-count" disabled="" type="button"><svg class="lucide lucide-flame" fill="none" height="18" stroke="#f97316" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg><span>0</span></button></div><div class="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-violet-200 bg-white px-3 py-1.5 shadow-sm transition-all hover:border-violet-300" data-act="usage" id="usage"><div class="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full bg-violet-100"><span class="h-1.5 w-1.5 rounded-full bg-violet-600"></span></div><div class="flex flex-col items-start gap-0 leading-none"><span class="flex items-center gap-1 text-[10px] font-bold text-violet-500"><svg class="lucide lucide-sparkles text-violet-400" fill="currentColor" height="10" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="10" xmlns="http://www.w3.org/2000/svg"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path><path d="M20 3v4"></path><path d="M22 5h-4"></path><path d="M4 17v2"></path><path d="M5 18H3"></path></svg> $ used today</span><span class="mt-[2px] flex items-baseline gap-1 text-[15px] font-bold text-violet-700">$0.00<span class="text-[13px] font-bold text-violet-500">/ 30</span></span></div><button class="ml-2 flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[8px] border border-violet-100 bg-violet-50 text-violet-600 shadow-sm transition-colors hover:border-violet-200 hover:bg-violet-100 disabled:opacity-50"><svg class="lucide lucide-refresh-cw" fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="13" xmlns="http://www.w3.org/2000/svg"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg></button></div></div><button class="w-fit h-10 pointer-events-auto rounded-[6px] p-2 p-button p-component p-button-icon-only" data-act="hamb" data-pc-name="button" data-pc-section="root" id="hamb-btn" title="Open sidebar"><svg class="lucide lucide-menu" fill="none" height="24" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg><span class="p-button-label p-c" data-pc-section="label"> </span></button></div></div></div></div><div class="w-full h-[calc(100%-5rem)] relative"><div class="w-full flex justify-between h-full overflow-visible gap-x-[0.5rem]"><div class="flex flex-col items-start w-full h-full"><div class="flex flex-col w-full h-full md:flex-row gap-x-4 relative"><div class="w-full h-full !overflow-visible" data-panel-group="" data-panel-group-direction="horizontal" data-panel-group-id=":rb:" style="display: flex; flex-direction: row; height: 100%; overflow: hidden; width: 100%;"><div class="overflow-visible relative transition-all duration-300 ease-in-out w-[45%] w-[45%]" data-panel="" data-panel-group-id=":rb:" data-panel-id="sidebar" data-panel-size="45.0" id="sidebar" style="flex: 45 1 0px; overflow: hidden;"><div class="flex flex-col w-full h-full relative border-r border-[#E5E5E5]" style="background-color: rgb(251, 250, 255); color: rgb(52, 64, 84);"><div class="w-full flex justify-between items-center h-[60px] px-5 border-b rounded-t-[8px]" style="background-color: rgb(255, 255, 255); color: rgb(52, 64, 84); border-color: rgb(229, 231, 235);"><div class="flex justify-between items-center gap-2"><nav class="w-full p-0 bg-transparent border-none flex-nowrap whitespace-nowrap overflow-hidden p-breadcrumb p-component border-none bg-transparent p-0" data-pc-name="breadcrumb" data-pc-section="root"><ol class="p-breadcrumb-list" data-pc-section="menu"><li class="p-menuitem bg-transparent p-0" data-pc-section="menuitem" id="pr_id_157_0"><button class="text-xs flex items-center gap-x-2 hover:text-[#5928ED] text-[#111827] transition-colors duration-200 p-button p-component" data-act="projects" data-cw-track="projects_opened" data-cw-track-params='{"source":"cw","component":"chat_header","action":"open_projects_page"}' data-pc-name="button" data-pc-section="root" data-testid="headerProjectsButton" style="color: rgb(52, 64, 84);" type="button"><span class="flex items-center justify-center w-4 h-4" data-testid="headerProjectButtonFolderIcon"><svg class="lucide lucide-folder-open" fill="none" height="24" stroke="#5928ED" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path></svg></span><span class="font-medium" data-testid="headerProjectButtonLabel">Projects</span></button></li></ol></nav></div><div class="flex h-9 items-center gap-x-3"><div class="h-9 border-l border-[#E5E5E5]"></div><button aria-label="Filter Settings" class="newChatBtn p-button p-component p-button-icon-only" data-act="filter" data-pc-name="button" data-pc-section="root" data-pr-position="top" data-pr-tooltip="Filter Settings"><i class="pi pi-sliders-h" style="color: rgb(89, 40, 237);"></i><span class="p-button-label p-c" data-pc-section="label"> </span></button><button aria-label="Start New Chat" class="newChatBtn p-button p-component p-button-icon-only" data-act="newchat" data-cw-track="new_chat_opened" data-cw-track-params='{"source":"cw","component":"chat_header","action":"start_new_chat"}' data-pc-name="button" data-pc-section="root" data-pr-position="top" data-pr-tooltip="New Chat" data-testid="headerNewChatButton"><svg data-testid="headerNewChatButtonIcon" fill="none" height="28" viewbox="0 0 191 191" width="28" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M0 0h191v191H0z" fill="url(#NewChatIcon_svg__a)"></path><defs><pattern height="1" id="NewChatIcon_svg__a" patterncontentunits="objectBoundingBox" width="1"><use transform="scale(.00667)" xlink:href="#NewChatIcon_svg__b"></use></pattern><image height="150" id="NewChatIcon_svg__b" preserveaspectratio="none" width="150" xlink:href="data:image/png;base64,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"/></defs></svg><span class="p-button-label p-c" data-pc-section="label"> </span></button><div class="relative inline-block"><button aria-label="Expand to right" class="expandToRight bg-[#fff] p-button p-component p-button-icon-only p-button-rounded" data-act="chatmin" data-pc-name="button" data-pc-section="root" data-testid="headerExpandChatButton"><svg fill="none" height="20" viewbox="0 0 165 165" width="20" xmlns="http://www.w3.org/2000/svg"><rect fill="none" height="145" rx="10" stroke="black" stroke-width="6" width="145" x="10" y="10"></rect><path d="M13 23C13 17.4772 17.4772 13 23 13H44C46.2091 13 48 14.7909 48 17V148C48 150.209 46.2091 152 44 152H23C17.4772 152 13 147.523 13 142V23Z" fill="#512CED"></path><path d="M56 17C56 14.7909 57.7909 13 60 13H142C147.523 13 152 17.4772 152 23V142C152 147.523 147.523 152 142 152H60C57.7909 152 56 150.209 56 148V17Z" fill="#fff" fill-opacity="0.25"></path><path d="M52 82.5 H125 M125 82.5 L95 60 M125 82.5 L95 105" stroke="#512CED" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"></path></svg><span class="p-button-label p-c" data-pc-section="label"> </span></button></div><div class="relative inline-block" id="menu-wrap"><button aria-label="Chat tools" class="chatToolsPopoverBtn p-button p-component p-button-icon-only p-button-rounded" data-act="menu" data-pc-name="button" data-pc-section="root" id="menu-btn" style="background-color: rgb(255, 255, 255); color: rgb(89, 40, 237);"><i class="pi pi-ellipsis-v text-[18px]" style="color: rgb(89, 40, 237);"></i><span class="p-button-label p-c" data-pc-section="label"> </span></button><div class="z-[9999] absolute right-0 top-full w-[230px] rounded border p-2 text-sm shadow-lg" id="ov-menu" style="background-color: rgb(255, 255, 255); border-color: rgb(229, 231, 235);;display:none"><button aria-label="Minimize Chat" class="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm font-medium transition-colors p-button p-component" data-act="mi" data-m="Minimize Chat" data-pc-name="button" data-pc-section="root" data-testid="headerMinimizeChatButton" style="color: rgb(52, 64, 84);" type="button"><i class="pi pi-times text-[18px]" style="color: rgb(89, 40, 237);"></i><span>Minimize Chat</span></button><button aria-pressed="false" class="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm font-medium transition-colors" data-act="mi" data-m="Recollect Harder Off" data-testid="headerThinkHarderButton" style="color: rgb(52, 64, 84);" type="button"><i class="pi pi-lightbulb shrink-0 text-[18px]" style="color: rgb(89, 40, 237);"></i><span>Recollect Harder Off</span></button><button class="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm font-medium transition-colors" data-act="mi" data-m="Conversation History" data-testid="headerHistoryButton" style="color: rgb(52, 64, 84);" type="button"><i class="pi pi-history shrink-0 text-[18px]" style="color: rgb(89, 40, 237);"></i><span>Conversation History</span></button><button aria-label="Export conversation to Docs" class="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm font-medium transition-colors" data-act="mi" data-m="Export to Docs" data-testid="headerExportToDocsButton" style="color: rgb(52, 64, 84); opacity: 1; cursor: pointer;" type="button"><svg class="lucide lucide-file-text shrink-0" fill="none" height="18" stroke="#5928ED" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><span>Export to Docs</span></button><button aria-label="Open Pre-release Quality Checklist" class="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm font-medium transition-colors" data-act="mi" data-m="Pre-Release Quality Checklist" data-testid="headerChecklistButton" style="color: rgb(52, 64, 84);" type="button"><svg class="lucide lucide-clipboard-list shrink-0" fill="none" height="18" stroke="#5928ED" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg"><rect height="4" rx="1" ry="1" width="8" x="8" y="2"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M12 11h4"></path><path d="M12 16h4"></path><path d="M8 11h.01"></path><path d="M8 16h.01"></path></svg><span>Pre-Release Quality Checklist</span></button><button aria-label="Open Log Controls" class="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm font-medium transition-colors" data-act="mi" data-m="Log Controls" data-testid="headerLogControlsButton" style="color: rgb(52, 64, 84);" type="button"><svg class="lucide lucide-logs shrink-0" fill="none" height="18" stroke="#5928ED" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M13 12h8"></path><path d="M13 18h8"></path><path d="M13 6h8"></path><path d="M3 12h1"></path><path d="M3 18h1"></path><path d="M3 6h1"></path><path d="M8 12h1"></path><path d="M8 18h1"></path><path d="M8 6h1"></path></svg><span>Log Controls</span></button><style>.small-switch {
             width: 32px;
@@ -2661,6 +2801,15 @@ ol.ans > li{margin-bottom:10px}
    <div class="view" id="view-KEY"><div class="rpt" id="rpt-key"></div></div>
    <div class="view" id="view-TIME"><div class="rpt" id="rpt-time"></div></div>
   </div></div>
+ </div>
+</div>
+
+<!-- ===== CONTRACTS ANALYSIS AND REDLINING (comparison, deviation analysis, redlining) ===== -->
+<div class="scr" id="scr-analysis" style="height:100%">
+ <div class="lm an">
+  <div class="lm-top"><span class="back" data-act="an-back" title="Back"><svg><use href="#i-chev"/></svg></span><h2>Contracts Analysis and redlining</h2>
+   <button class="an-exp" data-act="an-export"><svg><use href="#i-download"/></svg>Export Redlined Contract</button><span class="lm-ib" data-act="pj-new" title="Save to a project"><svg><use href="#i-folderplus"/></svg></span><span class="lm-ib" data-act="fullscreen" title="Full screen"><svg><use href="#i-expand"/></svg></span></div>
+  <div class="an-body" id="an-body"></div>
  </div>
 </div>
 
@@ -2929,6 +3078,173 @@ function chatItem(r){ return `<div class="lm-ci"><div class="lm-cih"><b>${r.n}. 
    <p class="lm-cis">${r.sum.split('…')[0]}…</p>
    <div class="lm-cif"><span class="lm-cw" data-act="lm-goto" data-n="${r.n}">Why this is the ${ord(r.n)} Match <span class="lm-pct ${scoreCls(r.score)}">${HAND}${r.score}%</span></span><span class="lm-open" data-act="lm-goto" data-n="${r.n}">Open ${ico('i-ext')}</span></div></div>`; }
 
+/* ======================= Contracts Analysis and redlining =======================
+   From the success story (1:59): "the same cognitive decisioning can also power comparison, redlining and deviation
+   analysis". 1) Comparison: the AI suggests templates and similar contracts, each with a similarity score and why it
+   is suggested; pick one, Compare. 2) Deviation analysis: the uploaded draft and the template side by side, section by
+   section, "No Deviation" or a % between them, the differing words highlighted on both sides; deviations by severity
+   High / Medium / Low with Fix. 3) Redlining: each fix is written into the draft as a tracked change. Sample data only. */
+const SEV={1:'high',4:'high',5:'high',0:'med',3:'med',6:'med',8:'med',2:'low',7:'low'};
+const SIM={0:64,1:41,2:78,3:66,4:58,5:52,6:71,7:74,8:60};
+const SEVN={high:'High',med:'Medium',low:'Low'};
+const LEAD={0:'The initial term is set out in Section 2.1.',1:'Each invoice shall include the purchase order number and the services delivered.',2:'Late payments are handled as follows.',
+  3:'Fees are listed in Schedule B.',4:'This Agreement may be ended as follows.',5:'Neither party limits its liability for fraud or gross negligence.',6:'Vendor shall keep the following insurance during the term.',
+  7:'Vendor shall keep complete records of the Services.',8:'This Agreement is the entire agreement between the parties.'};
+const SECS=[
+ {s:'1.1',n:'Services',a:'Vendor shall maintain the building systems listed in Schedule A, including HVAC, electrical and plumbing, at the service levels in Schedule C.',b:'Vendor shall perform the Services listed in Schedule A at the service levels in Schedule C.'},
+ {s:'2.1',n:'Term',a:'This Agreement runs for three (3) years from January 1, 2027.',b:'This Agreement runs for the term stated on the cover page.'},
+ {d:0},{s:'3.1',n:'Fees',a:'The Agency shall pay the fees in Schedule B.',b:'The Agency shall pay the fees in Schedule B.'},{d:1},
+ {s:'3.3',n:'Invoices',a:'Vendor shall invoice monthly in arrears, with the purchase order number.',b:'Vendor shall invoice monthly in arrears, with the purchase order number.'},{d:2},{d:3},{d:4},
+ {s:'7.1',n:'Confidential information',a:'Vendor shall keep Agency information confidential and use it only to perform the Services.',b:'Vendor shall keep Agency information confidential and use it only to perform the Services.'},
+ {s:'8.1',n:'Indemnity',a:'Vendor shall defend and indemnify the Agency against third-party claims arising from the Services.',b:'Vendor shall defend and indemnify the Agency against third-party claims arising from the Services.'},
+ {d:5},{d:6},{d:7},{d:8},
+];
+const PICKS=[
+ {k:'Template',n:'Vendor Services Template v4',sim:94,why:96,ord:'first',d:'The Agency’s standard terms for buying services from a vendor. Approved by Legal; 46 clauses.',r:['Same contract type: vendor services, paid monthly.','It is the template Legal approved for every vendor services contract.','44 of the draft’s 46 clause headings match it.']},
+ {k:'Template',n:'Facilities Services Template v2',sim:89,why:91,ord:'second',d:'Older template for building maintenance and repairs, before the vendor template replaced it.',r:['Covers building maintenance, like this draft.','Replaced by the vendor services template in 2025.']},
+ {k:'Similar Contract',n:'Security guard services · CTR-2026-01145',sim:86,why:88,ord:'third',d:'A signed facilities vendor contract on the Agency’s paper, $1.9M over 3 years.',r:['Signed on the template, with the same services structure.','Shows how Legal settled liability and insurance last time.']},
+];
+const EXPL={1:['The draft makes every invoice due <b>15 days from the invoice date</b>, not from receipt.','Your Vendor Services Template v4 allows <b>45 days from receipt of a proper invoice</b>, and every signed vendor contract follows it.'],
+  4:['The Agency can end the contract only if the vendor breaches it.','The template also lets the Agency end it for convenience on 30 days’ notice.'],
+  5:['The vendor’s liability is capped at 1× the annual fees ($400K).','The template caps it at 2× the total contract value ($2.4M).']};
+const sevIdx=s=>DEVS.map((_,i)=>i).filter(i=>SEV[i]===s);
+let AN={mode:'pick',pick:0,pickerOpen:false,exp:null,focus:null};
+const anReset=()=>{ AN={mode:'pick',pick:0,pickerOpen:false,exp:null,focus:null}; };
+
+/* ---------- render ---------- */
+function anSimTotal(){ const done=st.dev.filter(s=>s==='fixed'||s==='decided').length; return Math.min(100,94+Math.round(done*6/9)); }
+function anDevText(i,side){ const d=DEVS[i], s=st.dev[i];
+  if(side==='b') return `${LEAD[i]} <span class="an-hl ${s==='fixed'||s==='decided'?'ok':''}">${d.t}</span>`;
+  if(s==='fixed') return `${LEAD[i]} <span class="an-tc"><s>${d.v}</s> <ins>${d.t}</ins></span>`;
+  if(s==='decided'){ const keep=(d.you==='cap'&&st.choice.cap==='1x')||(d.you==='ins'&&st.choice.ins==='1m'); return keep?`${LEAD[i]} <span class="an-hl kept">${d.v}</span>`:`${LEAD[i]} <span class="an-tc"><s>${d.v}</s> <ins>${d.t}</ins></span>`; }
+  return `${LEAD[i]} <span class="an-hl">${d.v}</span>`; }
+function anLink(i){ const s=st.dev[i];
+  if(s==='fixed') return `<span class="an-lk ok">${ico('i-check')}Fixed</span>`;
+  if(s==='decided') return `<span class="an-lk ok">${ico('i-check')}Decided</span>`;
+  if(s==='you') return `<span class="an-lk you">Your call</span>`;
+  return `<span class="an-lk ${SEV[i]}">${SIM[i]}%</span>`; }
+function anRow(x,k){
+  if(x.d===undefined) return `<div class="an-row nd"><div class="an-sec"><div class="an-sh"><b>${x.n}</b><small>§ ${x.s}</small>${ico('i-chev')}</div></div><div class="an-mid"><span class="an-lk nd">No Deviation</span></div><div class="an-sec"><div class="an-sh"><b>${x.n}</b><small>§ ${x.s}</small>${ico('i-chev')}</div></div></div>`;
+  const i=x.d, d=DEVS[i], s=st.dev[i], st2=s==='fixed'||s==='decided'?'ok':s==='you'?'you':SEV[i];
+  return `<div class="an-row dv ${st2} ${AN.focus===i?'focus':''}" id="anr-${i}"><div class="an-sec"><div class="an-sh"><b>${d.n}</b><small>§ ${d.s}</small>${ico('i-chev')}</div><p>${anDevText(i,'a')}</p></div>
+    <div class="an-mid">${anLink(i)}</div><div class="an-sec"><div class="an-sh"><b>${d.n}</b><small>§ ${d.s}</small>${ico('i-chev')}</div><p>${anDevText(i,'b')}</p></div></div>`; }
+function anPickers(){ return `<div class="an-pk ${AN.mode==='cmp'&&!AN.pickerOpen?'min':''}" id="an-pk">
+   ${AN.mode==='cmp'?`<div class="an-pkbar" data-act="an-pkt">Suggested Templates/Contracts ${ico('i-chev')}</div>`:''}
+   <div class="an-pkb"><div class="an-pkh"><div><b>Select any Template or contract</b><small>Select a template or similar contract to compare with your uploaded document.</small></div>
+     <button class="an-cmp" id="an-cmp" data-act="an-cmp" ${AN.pick?'':'disabled'}>Compare</button></div>
+    <div class="an-cards">${PICKS.map((p,j)=>`<div class="an-card ${AN.pick===j+1?'on':''}" id="an-c${j+1}" data-act="an-pick" data-n="${j+1}">
+      <div class="an-ct"><span class="an-kind ${p.k==='Template'?'':'sim'}">${ico(p.k==='Template'?'i-doc':'i-layers')}${p.k}</span><span class="an-rad" id="an-r${j+1}"></span></div>
+      <div class="an-cn"><b>${p.n}</b><span class="an-simp">${p.sim}% Similarity</span></div><p>${p.d}</p>
+      <div class="an-why" data-act="an-why" data-n="${j+1}">Why this ${p.k==='Template'?'template':'contract'} is suggested ${p.ord}<span class="an-ds">${HAND}${p.why}%</span></div>
+      <ul class="an-wl" id="an-wl${j+1}">${p.r.map(r=>`<li>${r}</li>`).join('')}</ul></div>`).join('')}</div></div></div>`; }
+function renderAn(){ const b=$('#an-body'); if(!b) return; const p=PICKS[(AN.pick||1)-1];
+  if(AN.mode==='pick'){
+    b.innerHTML=`${anPickers()}<div class="an-doc"><div class="an-dh">${ico('i-doc')}<b>Uploaded Contract</b> · CTR-2026-01184_vendor-draft-v2.pdf<span class="sp"></span><span class="an-pg">1 / 18</span><span class="an-z">−</span><span class="an-pg">100%</span><span class="an-z">+</span></div>
+      <div class="pdfbg"><div class="paper legal">${kestrelPage('an')}</div></div></div>`;
+    return; }
+  b.innerHTML=`${anPickers()}<div class="an-tools"><span class="an-filt" data-act="an-filter">${ico('i-filter')}Filters</span></div>
+   <div class="an-cmpv"><div class="an-hd"><div class="an-col l">${ico('i-doc')}<b>Uploaded Contract</b><small>CTR-2026-01184_vendor-draft-v2.pdf</small></div><div class="an-mid"><span class="an-lk tot" id="an-tot">${anSimTotal()}% Similarity</span></div><div class="an-col r">${ico('i-book')}<b class="bl">${p.n}</b></div></div>
+    <div class="an-rows" id="an-rows">${SECS.map(anRow).join('')}</div></div>`; }
+function anUpd(i,s,anim){ st.dev[i]=s; updDev(i,s,false); const old=$('#anr-'+i); if(!old) return; const k=SECS.findIndex(x=>x.d===i);
+  const d=document.createElement('div'); d.innerHTML=anRow(SECS[k]); const el=d.firstElementChild; old.replaceWith(el); const t=$('#an-tot'); if(t) t.textContent=anSimTotal()+'% Similarity';
+  if(anim&&ANIM){ el.classList.add(s==='marked'?'mark-in':'flash'); } }
+async function anFocus(i,anim){ AN.focus=i; $$('#an-rows .an-row').forEach(r=>r.classList.toggle('focus',r.id==='anr-'+i)); const el=$('#anr-'+i), box=$('#an-rows'); if(!el||!box) return;
+  const er=el.getBoundingClientRect(), br=box.getBoundingClientRect(); const top=box.scrollTop+(er.top-br.top)/Z;
+  const tgt=Math.max(0,top-24); if(anim&&ANIM) await smoothScroll(box,tgt,700); else box.scrollTop=tgt; }
+
+/* ---------- the severity panel in chat ---------- */
+function sevItem(i,n){ const d=DEVS[i], s=st.dev[i], done=s==='fixed'||s==='decided';
+  return `<div class="sv-it ${done?'done':''}" id="sv-${i}"><div class="sv-r"><span class="sv-t">${n}. ${d.n} <small>§ ${d.s}</small></span><span class="sv-hand">${HAND}</span>
+    ${done?`<span class="sv-ok">${ico('i-check')}Fixed</span>`:s==='you'?`<span class="sv-you">Your call</span>`:`<span class="sv-fix" data-act="sv-fix" data-i="${i}">Fix</span>`}<span class="sv-go" data-act="sv-go" data-i="${i}">${ico('i-ext')}</span></div>
+    ${AN.exp===i?sevExplain(i):''}</div>`; }
+function sevExplain(i){ const e=EXPL[i]||[`The draft says: “${DEVS[i].v}”`,`Your template says: “${DEVS[i].t}”`]; const done=st.dev[i]==='fixed';
+  return `<div class="sv-ex"><div class="sv-exh">Explanation${ico('i-chev')}</div><ol>${e.map(x=>`<li>${x}</li>`).join('')}</ol>
+    ${done?`<div class="sv-done">${ico('i-check')}Fixed: ${DEVS[i].fix}. Tracked in the redline.</div>`:`<span class="sv-fixthis" id="fix-this" data-act="fix-this" data-i="${i}">Fix this deviation ${icoS('i-arrow',14)}</span>`}
+    <div class="sv-cd"><span>${HAND}Cognitive Decisioning AI</span><span class="sv-dstr">${ico('i-spark')}Decision Strength ${i===1?96:92}%</span></div>
+    <div class="sv-acc" data-act="sv-acc"><span class="ic y">${ico('i-bulb')}</span><div><b>Reasoning</b><small>Why This Was Picked</small></div>${ico('i-chev')}<div class="sv-ab">Section ${DEVS[i].s} is the only ${DEVS[i].n.toLowerCase()} clause in the draft, and the template’s § ${DEVS[i].s} is the version Legal approved.</div></div>
+    <div class="sv-acc" data-act="sv-acc"><span class="ic b">${ico('i-scan')}</span><div><b>Gap</b><small>What’s missing or unclear</small></div>${ico('i-chev')}<div class="sv-ab">${i===1?'The draft never defines a “proper invoice”; the template does in § 3.3.':'No gaps identified.'}</div></div></div>`; }
+function sevPanel(){ let n=0; const grp=s=>{ const ids=sevIdx(s); const open=s==='high';
+    return `<div class="sv-g ${s} ${open?'open':''}"><div class="sv-gh" data-act="sv-grp"><b>${SEVN[s]}(${ids.length})</b>${s==='high'?`<span class="sv-rev" id="sev-review" data-act="sv-review">Review ›</span>`:ico('i-chev')}</div><div class="sv-gb">${ids.map(i=>sevItem(i,++n)).join('')}</div></div>`; };
+  return `<div class="sv" id="sv-panel">${grp('high')}${grp('med')}${grp('low')}</div>`; }
+function sevRefresh(){ const p=$('#sv-panel'); if(!p) return; const open=[...p.querySelectorAll('.sv-g')].map(g=>g.classList.contains('open')); const d=document.createElement('div'); d.innerHTML=sevPanel(); const nw=d.firstElementChild;
+  [...nw.querySelectorAll('.sv-g')].forEach((g,k)=>g.classList.toggle('open',open[k])); p.replaceWith(nw); }
+
+/* ---------- the guided steps (replace the old single-column redline) ---------- */
+const AN_STEPS=[
+ {id:'open',label:'Pick what to compare',run:async t=>{
+    const c=$('#rd-9')||$('#chip-open'); if(ANIM&&c){await point(c); await sleep(120); guard(t);} hideCursor();
+    anReset(); show('analysis'); renderAn(); $('#an-body').scrollTop=0;
+    raw(`<div class="divider">Opened CTR-2026-01184</div>`);
+    const m=bot(`<p>The vendor draft <b>CTR-2026-01184</b> (Kestrel Facility Services, $1.2M over 3 years) is loaded and ready.</p><p style="margin-top:6px">Based on it, here are the <b>templates and similar contracts</b> you may want to compare it with. Please select one to start the comparison.</p>`,'9:44 AM');
+    await scrollChat(m);
+    if(ANIM){ await sleep(900); guard(t); } const wl=$('#an-wl1'); if(wl) wl.classList.add('on'); // it explains why the first template is suggested
+ }},
+ {id:'compare',label:'Side by side',run:async t=>{
+    if(!AN.pick){ const r=$('#an-c1'); if(ANIM&&r){ await point($('#an-r1')); await sleep(120); guard(t);} AN.pick=1; renderAn(); if(ANIM){ await sleep(420); guard(t);} }
+    const b=$('#an-cmp'); if(ANIM&&b){ await point(b); await sleep(120); guard(t);} hideCursor();
+    const u=user(`Compare with ${PICKS[AN.pick-1].n}`,'9:45 AM'); await scrollChat(u);
+    AN.mode='cmp'; renderAn(); $('#an-rows').scrollTop=0;
+    await analyzing(t,'Contract Comparison',[['Paired every section with the template · <b>46 of 46</b>'],['Compared the wording clause by clause · <b>37 match</b>'],['Rated each deviation by severity · <b>3 high, 4 medium, 2 low</b>']],'3');
+    for(let i=0;i<DEVS.length;i++){ guard(t); anUpd(i,'marked',true); if(ANIM) await sleep(140); }
+    const a=bot(`<p>Below are the <b>9 deviations</b> I found, categorized by severity to make the review easier.</p>${sevPanel()}
+      <p class="lm-lbl" style="margin-top:12px">Suggested next steps:</p>${opt('Deep dive into: Payment terms, § 3.2','data-act="sv-review"')}${opt('Fix every routine deviation','data-act="fix"')}`,'9:46 AM');
+    await scrollChat(a,'top');
+ }},
+ {id:'review',label:'Why it’s a deviation',run:async t=>{
+    const r=$('#sev-review'); if(ANIM&&r){ await point(r); await sleep(120); guard(t);} hideCursor();
+    AN.exp=1; sevRefresh(); await anFocus(1,true); await scrollChat($('#sv-panel'),'top'); // the whole panel stays in view
+ }},
+ {id:'fixone',label:'Fixed as a tracked change',run:async t=>{
+    const f=$('#fix-this'); if(ANIM&&f){ await point(f); await sleep(150); guard(t);} hideCursor();
+    anUpd(1,'fixed',true); setStatus('redline'); sevRefresh();
+    const m=bot(`<p><b>Fixed.</b> Section 3.2 now matches your template: payment within <b>45 days of a proper invoice</b>. The change is tracked in the redline.</p>
+      <div class="nchips"><span class="nchip go" id="chip-fix" data-act="fix">${ico('i-spark')}Fix the 6 other routine ones</span><span class="nchip" data-act="free" data-q="all9">Show all 9</span></div>`,'9:46 AM');
+    await scrollChat(m);
+ }},
+ {id:'autofix',label:'7 fixed, 2 left',run:async t=>{
+    const b=$('#chip-fix'); if(ANIM&&b){await point(b); await sleep(120); guard(t);} hideCursor(); if(b) b.classList.add('picked');
+    for(let i=0;i<DEVS.length;i++){ if(st.dev[i]==='fixed') continue; guard(t); if(DEVS[i].fix) await anFocus(i,true); anUpd(i,DEVS[i].fix?'fixed':'you',true); if(ANIM) await sleep(DEVS[i].fix?380:160); }
+    await anFocus(5,true); sevRefresh();
+    const a=bot(`<p class="lead"><b>7 of 9 fixed</b> to match your template. Every change is a tracked change in the redline.</p>
+      <ul class="fixlist">${DEVS.filter(d=>d.fix).map(d=>`<li>${tick}${d.fix}</li>`).join('')}</ul>
+      <div class="dec" id="dec"><div class="dh">${ico('i-scale')}2 calls for you</div>
+        ${DEVS.filter(d=>d.you).map(d=>{const c=CHOICES[d.you]; return `<div class="dr"><div class="dt">${d.n} · § ${d.s}<span class="risk ${d.r}"><i></i>${d.r==='high'?'High':'Medium'}</span></div>
+          <div class="rec">AI recommends: <b>${c.opts.find(o=>o[0]===c.rec)[1]}</b>, as in your template.</div>
+          <div class="opts">${c.opts.map(o=>`<span class="opt ${st.choice[d.you]===o[0]?'on':''}" data-act="choose" data-g="${d.you}" data-v="${o[0]}">${st.choice[d.you]===o[0]?ico('i-check'):''}${o[1]}</span>`).join('')}</div></div>`;}).join('')}
+        <div class="df"><button class="btn pri sm" id="chip-apply" data-act="apply">${ico('i-check')}Apply my decisions</button></div></div>`,'9:47 AM');
+    await scrollChat(a);
+ }},
+ {id:'decide',label:'Attorney decides',run:async t=>{
+    const b=$('#chip-apply'); if(ANIM&&b){await point(b); await sleep(150); guard(t);} hideCursor();
+    if(b){ b.disabled=true; b.classList.add('done'); b.innerHTML=ico('i-check')+'Applied'; } $$('#dec .opt').forEach(o=>o.classList.add('locked'));
+    for(let i=0;i<DEVS.length;i++){ if(DEVS[i].you){ guard(t); anUpd(i,'decided',true); if(ANIM) await sleep(380); } }
+    setStatus('ready'); sevRefresh();
+    const a=bot(`<div class="allok"><div class="gh">${icoS('i-check',18)}Redline complete · 0 open deviations</div><p>7 fixed to match the template and 2 decided by you. Payment is now net 45, and the review took <b>5 minutes</b>.</p></div>
+      <div class="nchips"><span class="nchip go okc" id="chip-approve" data-act="approve">${ico('i-check')}Approve and send for signature</span><span class="nchip" data-act="an-export">Export the redlined contract</span></div>`,'9:48 AM');
+    await scrollChat(a,'top');
+ }},
+];
+
+/* ---------- clicks ---------- */
+document.addEventListener('click',async e=>{ const el=e.target.closest('[data-act^="an-"],[data-act^="sv-"],[data-act="fix-this"]'); if(!el||playing) return; const a=el.dataset.act;
+  if((busy||advancing)&&!['sv-acc','sv-grp','an-pkt','an-why'].includes(a)) return;
+  switch(a){
+   case 'an-pick': { if(e.target.closest('[data-act="an-why"]')) break; if(AN.mode==='cmp'&&cur>=idx('compare')){ AN.pick=+el.dataset.n; renderAn(); break; } AN.pick=+el.dataset.n; renderAn(); updateHint(); break; }
+   case 'an-why': { e.stopPropagation(); const l=$('#an-wl'+el.dataset.n); if(l) l.classList.toggle('on'); break; }
+   case 'an-cmp': if(!AN.pick){ toast('Select a template or contract first'); break; } if(cur===idx('open')) await advanceTo('compare'); else { AN.mode='cmp'; AN.pickerOpen=false; renderAn(); } break;
+   case 'an-pkt': AN.pickerOpen=!AN.pickerOpen; renderAn(); break;
+   case 'an-filter': toast('Filters: severity, section, fixed or open · 0 applied'); break;
+   case 'an-export': modal(`<div class="mh"><span class="ic">${ico('i-download')}</span><h3>Export redlined contract</h3></div><div class="mb">CTR-2026-01184_vendor-draft-v2_<b>redlined</b>.docx · every change as a tracked change, with a comment on each deviation explaining why it changed.</div><div class="mf"><button class="btn out" data-act="close-modal">Cancel</button><button class="btn pri" data-act="dl">${ico('i-download')}Download .docx</button></div>`); break;
+   case 'an-back': show(cur>=idx('done')?'corpus':'results'); break;
+   case 'sv-grp': el.parentElement.classList.toggle('open'); break;
+   case 'sv-review': if(cur===idx('compare')) await advanceTo('review'); else { const g=$('#sv-panel .sv-g.high'); if(g) g.classList.add('open'); AN.exp=1; sevRefresh(); show('analysis'); if(AN.mode!=='cmp'){ AN.mode='cmp'; renderAn(); } await anFocus(1,true); } break;
+   case 'sv-go': { const i=+el.dataset.i; show('analysis'); if(AN.mode!=='cmp'){ AN.mode='cmp'; renderAn(); } await anFocus(i,true); break; }
+   case 'sv-fix': { const i=+el.dataset.i; if(i===1&&cur===idx('review')){ await advanceTo('fixone'); break; } if(cur<idx('compare')) break; if(DEVS[i].you){ toast('This one is a legal call: choose an option below'); break; } AN.exp=i; anUpd(i,'fixed',true); sevRefresh(); await anFocus(i,true); toast(`Fixed: ${DEVS[i].fix}`); break; }
+   case 'fix-this': { const i=+el.dataset.i; if(i===1&&cur===idx('review')) await advanceTo('fixone'); else if(!DEVS[i].you){ anUpd(i,'fixed',true); sevRefresh(); toast(`Fixed: ${DEVS[i].fix}`); } break; }
+   case 'sv-acc': el.classList.toggle('open'); break;
+  }
+});
+
 /* ======================= helpers ======================= */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const msgs=$('#msgs'), scroller=$('#msgscroll'), cursor=$('#cursor');
@@ -2977,12 +3293,12 @@ let toastTimer; function toast(t){ $('#toast-t').textContent=t; $('#toast').clas
 /* ======================= state ======================= */
 const S0=()=>({genie:false,status:'review',sent:false,filter:'All',view:'DOC',sel:0,dev:DEVS.map(()=>'hidden'),choice:{cap:'2x',ins:'2m'},t:0,stars:0,org:'All organisations',recollect:false,ping:false});
 let st=S0();
-function clock(){ st.t++; const base=cur>=11?50:cur>=7?44:cur>=3?42:39; return `9:${String(Math.min(59,base+st.t)).padStart(2,'0')} AM`; }
+function clock(){ st.t++; const base=cur>=13?50:cur>=7?44:cur>=3?42:39; return `9:${String(Math.min(59,base+st.t)).padStart(2,'0')} AM`; }
 
 /* ======================= screens ======================= */
 let screen='home';
 function show(name){ screen=name; $$('#screens > .scr').forEach(s=>s.classList.toggle('on',s.id==='scr-'+name)); closeOv();
-  if(name==='corpus') renderCorpus(); if(name==='projects') renderProjects(); if(name!=='search'&&name!=='contract') document.body.classList.remove('wide'); updateHint(); }
+  if(name==='corpus') renderCorpus(); if(name==='projects') renderProjects(); if(name!=='search'&&name!=='contract'&&name!=='analysis') document.body.classList.remove('wide'); updateHint(); }
 function greet(){ return bot(`<p class="cxp"><b>Suggested Actions:</b></p><p class="cxp">Please select one of the options below to get started.</p>${opt('Search contracts','id="sg-main" data-act="sugg" data-k="main"')}${opt('Redline a contract','data-act="sugg" data-k="redline0"')}${opt('Compare contracts','data-act="sugg" data-k="compare0"')}${opt('Generate a contract','data-act="gen"')}${opt('Validate contract integrity','data-act="sugg" data-k="validate"')}${opt('Or, type your question below','data-act="focus"')}`,'9:38 AM'); }
 function renderSugg(){}
 function closeOv(){ ['#ov-menu','#ov-modes','#ov-filter','#ov-hamb'].forEach(s=>{const e=$(s); if(e) e.style.display='none';}); $$('.org-list').forEach(x=>x.classList.remove('on')); }
@@ -3107,48 +3423,7 @@ const STEPS=[
       <p style="margin-top:10px">Suggested next steps:</p>${opt('Redline CTR-2026-01184 against our template','id="chip-open" data-act="open-main"')}${opt('Show more of such contracts','data-act="free" data-q="more"')}`,'9:42 AM');
     await scrollChat(n,'top');
  }},
- {id:'open',label:'Contract opens',run:async t=>{
-    const c=$('#rd-9')||$('#chip-open'); if(ANIM&&c){await point(c); await sleep(120); guard(t);} hideCursor();
-    show('contract'); setView('DOC');
-    raw(`<div class="divider">Opened CTR-2026-01184</div>`);
-    const m=bot(`<p>This is a vendor draft of a <b>facilities maintenance services agreement</b> with Kestrel Facility Services: $1.2M over 3 years.</p><p style="margin-top:6px">It came in on the vendor’s own paper, so I’ll compare it with your <b>Vendor services template v4</b>, clause by clause.</p>
-      <div class="nchips"><span class="nchip go" id="cmp-btn" data-act="compare">${ico('i-spark')}Compare it with our template</span></div>`,'9:44 AM');
-    await scrollChat(m);
- }},
- {id:'redline',label:'AI redline',run:async t=>{
-    const b=$('#cmp-btn'); if(ANIM&&b){await point(b); await sleep(120); guard(t);} hideCursor(); if(b) b.classList.add('picked');
-    setView('RL'); renderRedline();
-    await analyzing(t,'AI Redlining',[['Read the vendor draft · <b>18 pages, 46 clauses</b>','Including Schedules A to C.','0.9'],['Matched each clause to your template · <b>Vendor services v4</b>','46 of 46 clauses paired, 2 renumbered.','0.6'],['Compared the wording clause by clause · <b>9 deviations</b>','37 clauses match the template.','1.2'],['Rated each deviation by risk · <b>4 high, 5 medium</b>','Risk to the Agency: money, liability, exit rights and jurisdiction.','0.8'],['Sorted routine fixes from legal calls · <b>7 routine, 2 for you</b>','Routine: the template already says what to do. Legal calls: a business trade-off.','0.7']],'4.2');
-    for(let i=0;i<DEVS.length;i++){ guard(t); await updDev(i,'marked',true); await sleep(240); }
-    const a=bot(`<p class="lead"><b>9 deviations</b> from your template: 4 high risk, 5 medium.</p>
-      <div class="devsum"><div class="dh">Routine · I can fix these to match the template<span class="n">7</span></div><ul>${DEVS.filter(d=>d.fix).map(d=>`<li><i style="background:${d.r==='high'?'var(--bad)':'#E0A800'}"></i>${d.n}<span>§ ${d.s}</span></li>`).join('')}</ul></div>
-      <div class="devsum"><div class="dh">Legal calls · these need you<span class="n">2</span></div><ul>${DEVS.filter(d=>d.you).map(d=>`<li><i style="background:${d.r==='high'?'var(--bad)':'#E0A800'}"></i>${d.n}<span>§ ${d.s}</span></li>`).join('')}</ul></div>
-      <div class="nchips"><span class="nchip go" id="chip-fix" data-act="fix">${ico('i-spark')}Fix the 7 routine ones</span><span class="nchip" data-act="free" data-q="all9">Show all 9</span></div>`,'9:46 AM');
-    await scrollChat(a,'top');
- }},
- {id:'autofix',label:'7 fixed, 2 left',run:async t=>{
-    const b=$('#chip-fix'); if(ANIM&&b){await point(b); await sleep(120); guard(t);} hideCursor(); if(b) b.classList.add('picked');
-    setView('RL'); setStatus('redline');
-    for(let i=0;i<DEVS.length;i++){ guard(t); await updDev(i,DEVS[i].fix?'fixed':'you',true); await sleep(DEVS[i].fix?420:200); }
-    const a=bot(`<p class="lead"><b>Fixed 7</b> to match your template. Every change is tracked in the redline.</p>
-      <ul class="fixlist">${DEVS.filter(d=>d.fix).map(d=>`<li>${tick}${d.fix}</li>`).join('')}</ul>
-      <div class="cnt-pill num"><span>9 deviations</span><span style="color:#9CA3AF;font-weight:600">→</span><span class="to">2 to review</span></div>
-      <div class="dec" id="dec"><div class="dh">${ico('i-scale')}2 calls for you</div>
-        ${DEVS.filter(d=>d.you).map(d=>{const c=CHOICES[d.you]; return `<div class="dr"><div class="dt">${d.n} · § ${d.s}<span class="risk ${d.r}"><i></i>${d.r==='high'?'High':'Medium'}</span></div>
-          <div class="rec">AI recommends: <b>${c.opts.find(o=>o[0]===c.rec)[1]}</b>, as in your template.</div>
-          <div class="opts">${c.opts.map(o=>`<span class="opt ${st.choice[d.you]===o[0]?'on':''}" data-act="choose" data-g="${d.you}" data-v="${o[0]}">${st.choice[d.you]===o[0]?ico('i-check'):''}${o[1]}</span>`).join('')}</div></div>`;}).join('')}
-        <div class="df"><button class="btn pri sm" id="chip-apply" data-act="apply">${ico('i-check')}Apply my decisions</button></div></div>`,'9:47 AM');
-    await scrollChat(a);
- }},
- {id:'decide',label:'Attorney decides',run:async t=>{
-    const b=$('#chip-apply'); if(ANIM&&b){await point(b); await sleep(150); guard(t);} hideCursor();
-    if(b){ b.disabled=true; b.classList.add('done'); b.innerHTML=ico('i-check')+'Applied'; } $$('#dec .opt').forEach(o=>o.classList.add('locked'));
-    for(let i=0;i<DEVS.length;i++){ if(DEVS[i].you){ guard(t); await updDev(i,'decided',true); await sleep(380); } }
-    setStatus('ready');
-    const a=bot(`<div class="allok"><div class="gh">${icoS('i-check',18)}Redline complete · 0 open deviations</div><p>7 fixed to match the template and 2 decided by you. Payment is now net 45, and the review took <b>5 minutes</b>.</p></div>
-      <div class="nchips"><span class="nchip go okc" id="chip-approve" data-act="approve">${ico('i-check')}Approve and send for signature</span><span class="nchip" data-act="dl">Download the redline</span></div>`,'9:48 AM');
-    await scrollChat(a,'top');
- }},
+ ...AN_STEPS, // comparison -> side by side -> review one -> fix one -> fix the rest -> decide (src/analysis.js)
  {id:'approve',label:'Attorney approves',run:async t=>{
     const c=$('#chip-approve'); if(ANIM&&c){await point(c); await sleep(120); guard(t);} hideCursor();
     modal(`<div class="mh"><span class="ic" style="background:var(--ok-soft);color:var(--ok)">${ico('i-check')}</span><h3>Approve CTR-2026-01184?</h3></div>
@@ -3224,7 +3499,7 @@ const idx=id=>STEPS.findIndex(s=>s.id===id);
 function label(){ $('#lbl').textContent=`${cur+1} / ${STEPS.length} · ${STEPS[cur].label}`; history.replaceState(null,'',location.pathname+location.search+'#'+STEPS[cur].id); updateHint(); }
 function reset(){
   st=S0(); msgs.innerHTML=''; scroller.scrollTop=0; hideCursor(); closeModal(); closeOv(); $('#toast').classList.remove('on');
-  renderResults(); $('#t-doc').innerHTML=templatePage(); setStatus('review'); setView('DOC'); renderRedline();
+  renderResults(); $('#t-doc').innerHTML=templatePage(); setStatus('review'); setView('DOC'); renderRedline(); anReset(); renderAn();
   $('#cin').value=''; document.body.classList.remove('chat-min','wide'); paintStars();
 }
 async function goTo(i){ const t=++TOKEN; ANIM=false; busy=false; advancing=false; freeBusy=false; document.body.classList.add('instant'); reset();
@@ -3238,7 +3513,8 @@ async function play(){ if(playing) return; playing=true; AUTOPLAY=true; $('#b-pl
   if(cur>=STEPS.length-1) await goTo(0);
   while(playing&&cur<STEPS.length-1){ await next(); await realSleep(1400); }
   playing=false; AUTOPLAY=false; hideCursor(); $('#b-play').textContent='Play'; updateHint(); }
-const HINTS={0:'#sg-main',3:'#why-1',4:'#vp-1',5:'#show-gap',6:'#rd-9',7:'#cmp-btn',8:'#chip-fix',9:'#chip-apply',10:'#chip-approve',11:'#m-approve',12:'#back-queue',13:'#done-banner .btn'};
+const HINTS={0:'#sg-main',3:'#why-1',4:'#vp-1',5:'#show-gap',6:'#rd-9',7:'#an-cmp:not([disabled]), #an-c1:not(.on)',8:'#sev-review',9:'#fix-this',10:'#chip-fix',11:'#chip-apply',12:'#chip-approve',13:'#m-approve',14:'#back-queue',15:'#done-banner .btn'};
+function showAn(){ show('analysis'); if(cur>=idx('compare')&&AN.mode!=='cmp'){ AN.mode='cmp'; } renderAn(); }
 function updateHint(){ $$('.hint').forEach(e=>e.classList.remove('hint')); if(busy||playing||advancing) return; const sel=HINTS[cur]; const el=sel&&$(sel); if(el&&el.offsetParent) el.classList.add('hint'); }
 
 /* ======================= header bits ======================= */
@@ -3261,7 +3537,7 @@ document.addEventListener('click',async e=>{
     case 'lm-why': { const n=+el.dataset.n; if(cur===3&&n===1) await advanceTo('reasoning'); else openWhy(n); break; }
     case 'lm-pdf': { const n=+el.dataset.n; if(cur===4&&n===1) await advanceTo('citation'); else openPdf(n); break; }
     case 'lm-pdf-x': openPdf(+el.dataset.n,false); break;
-    case 'lm-redline': { const n=+el.dataset.n; if(n===9){ if(cur===6) await advanceTo('open'); else { show('contract'); setView(cur>=8?'RL':'DOC'); } } else { const r=RES.find(x=>x.n===n); toast(`${r.cp} is already signed · this demo redlines CTR-2026-01184`); } break; }
+    case 'lm-redline': { const n=+el.dataset.n; if(n===9){ if(cur===6) await advanceTo('open'); else showAn(); } else { const r=RES.find(x=>x.n===n); toast(`${r.cp} is already signed · this demo redlines CTR-2026-01184`); } break; }
     case 'lm-compare': { const n=+el.dataset.n; if(n===9){ show('contract'); setView('TPL'); } else toast('Pick a second contract to compare with (demo)'); break; }
     case 'lm-rate': toast('Thanks, your rating helps rank results'); break;
     case 'lm-expand': { const n=+el.dataset.n; if(n===9){ show('contract'); setView(st.view); } else { const r=RES.find(x=>x.n===n); toast(`${r.id} · ${r.cp}`); } break; }
@@ -3285,22 +3561,24 @@ document.addEventListener('click',async e=>{
     case 'feat': { const f=el.dataset.f;
       if(f==='search'){ if(cur===0) await advanceTo('results'); else show('results'); }
       else if(f==='corpus') show('corpus');
-      else if(f==='redline'){ if(cur===6) await advanceTo('open'); else if(cur===7) await advanceTo('redline'); else { show('contract'); setView(cur>=8?'RL':'DOC'); } }
-      else if(f==='compare'){ show('contract'); setView('TPL'); }
+      else if(f==='redline'){ if(cur===6) await advanceTo('open'); else if(cur===7) await advanceTo('compare'); else showAn(); }
+      else if(f==='compare'){ if(cur===6) await advanceTo('open'); else if(cur===7) await advanceTo('compare'); else { if(cur<7){ AN.mode='pick'; } showAn(); } }
       else if(f==='compliance'){ show('contract'); setView('KEY'); }
       else toast('Generate a contract is coming soon');
       break; }
     case 'logo': playing=false; AUTOPLAY=false; closeOv(); closeModal(); await goTo(0); break;
     case 'restart': playing=false; AUTOPLAY=false; closeOv(); closeModal(); await goTo(0); toast('Demo restarted'); break;
     case 'cfilter': st.filter=el.dataset.f; renderCorpus(); updateHint(); break;
-    case 'row': { closeOv(); const id=el.dataset.id; if(id===MAIN){ if(cur===6) await advanceTo('open'); else { show('contract'); setView(st.view); } } else { const r=[...QUEUE,...EXEC].find(x=>x.id===id); toast(`${r.id} · ${r.title} · ${r.sum?r.sum.split('.')[0]:'matches its template'}`); } break; }
+    case 'row': { closeOv(); const id=el.dataset.id; if(id===MAIN){ if(cur===6) await advanceTo('open'); else showAn(); } else { const r=[...QUEUE,...EXEC].find(x=>x.id===id); toast(`${r.id} · ${r.title} · ${r.sum?r.sum.split('.')[0]:'matches its template'}`); } break; }
     case 'view': setView(el.dataset.v); break;
     case 'send': { const v=$('#cin').value.trim(); if(v) pulseSend();
       if(cur===0&&(!v||/45|payment|net|days/i.test(v))){ await advanceTo('results'); }
       else if(cur===6&&/redline|check|template|01184|kestrel|open/i.test(v)){ $('#cin').value=''; await advanceTo('open'); }
-      else if(cur===7&&/compar|template|redline/i.test(v)){ $('#cin').value=''; await advanceTo('redline'); }
-      else if(cur===8&&/fix/i.test(v)){ $('#cin').value=''; await advanceTo('autofix'); }
-      else if(cur===10&&/approve|sign/i.test(v)){ $('#cin').value=''; await advanceTo('approve'); }
+      else if(cur===7&&/compar|template|redline/i.test(v)){ $('#cin').value=''; await advanceTo('compare'); }
+      else if(cur===8&&/review|why|explain|payment|deep/i.test(v)){ $('#cin').value=''; await advanceTo('review'); }
+      else if(cur===9&&/fix/i.test(v)){ $('#cin').value=''; await advanceTo('fixone'); }
+      else if(cur===10&&/fix/i.test(v)){ $('#cin').value=''; await advanceTo('autofix'); }
+      else if(cur===12&&/approve|sign/i.test(v)){ $('#cin').value=''; await advanceTo('approve'); }
       else if(v){ $('#cin').value=''; const key=/summar/i.test(v)?'summary':/date|deadline/i.test(v)?'dates':/renew/i.test(v)?'renew':/review|queue/i.test(v)?'corpus':/deviation/i.test(v)?'all9':null; freeQA(key,v); }
       else $('#cin').focus();
       break; }
@@ -3310,29 +3588,29 @@ document.addEventListener('click',async e=>{
     case 'wstep': el.classList.toggle('open'); break;
     case 'trace': toast('Trace: 5 steps · 1,248 contracts · 3,912 clauses'); break;
     case 'dl': toast('Downloads are turned off in this demo'); break;
-    case 'open-main': closeOv(); if(cur===6) await advanceTo('open'); else { show('contract'); setView('DOC'); } break;
+    case 'open-main': closeOv(); if(cur===6) await advanceTo('open'); else showAn(); break;
     case 'open-tpl': show('contract'); setView('TPL'); break;
-    case 'compare': if(cur===7) await advanceTo('redline'); else { show('contract'); setView('RL'); } break;
-    case 'fix': if(cur===8) await advanceTo('autofix'); break;
+    case 'compare': if(cur===7) await advanceTo('compare'); else showAn(); break;
+    case 'fix': if(cur===10) await advanceTo('autofix'); else if(cur===8||cur===9) toast('Review the high-risk ones first: start with Payment terms'); break;
     case 'choose': { if(el.classList.contains('locked')) break; const g=el.dataset.g; st.choice[g]=el.dataset.v; el.parentElement.querySelectorAll('.opt').forEach(o=>{ const on=o.dataset.v===st.choice[g]; o.classList.toggle('on',on); o.innerHTML=(on?ico('i-check'):'')+CHOICES[g].opts.find(x=>x[0]===o.dataset.v)[1]; }); break; }
-    case 'apply': if(cur===9) await advanceTo('decide'); break;
-    case 'approve': if(cur===10) await advanceTo('approve'); else if(cur>=11) toast('This contract is already approved'); break;
-    case 'send-sign': if(cur===11) await advanceTo('sent'); break;
+    case 'apply': if(cur===11) await advanceTo('decide'); break;
+    case 'approve': if(cur===12) await advanceTo('approve'); else if(cur>=13) toast('This contract is already approved'); break;
+    case 'send-sign': if(cur===13) await advanceTo('sent'); break;
     case 'close-modal': closeModal(); updateHint(); break;
-    case 'back-queue': if(cur===12) await advanceTo('done'); else show('corpus'); break;
+    case 'back-queue': if(cur===14) await advanceTo('done'); else show('corpus'); break;
     case 'view-sum': modal(`<div class="cb"><div class="ct"><div><h2>Review summary</h2><small class="num">CTR-2026-01184 · Nov 20, 2026</small></div><div class="seal">REVIEWED<br>SAMPLE<br>CONTRACT</div></div>
         <div class="grid"><div><span>Contract</span><b>Facilities maintenance services agreement</b></div><div><span>Counterparty</span><b>Kestrel Facility Services LLC</b></div><div><span>Checked against</span><b>Vendor services template v4</b></div><div><span>Deviations</span><b>9 found · 7 fixed by AI · 2 decided</b></div><div><span>Payment terms</span><b>Net 45</b></div><div><span>Review time</span><b>5 minutes</b></div></div>
         <div class="cond"><b>Changes sent to the vendor.</b> ${DEVS.filter(d=>d.fix).map(d=>d.fix).join(' · ')} · ${CHOICES.cap.tag[st.choice.cap]} · ${CHOICES.ins.tag[st.choice.ins]}.</div></div>
         <div class="mf"><button class="btn out" data-act="dl">Download redline</button><button class="btn pri" data-act="close-modal">Close</button></div>`,true); break;
-    case 'req-chg': if(cur<8) toast('Run the AI redline first, so the changes are tracked'); else if(cur<11) toast('The redline already holds every change for the vendor'); else toast('This contract is already out for signature'); break;
+    case 'req-chg': if(cur<8) toast('Run the AI redline first, so the changes are tracked'); else if(cur<13) toast('The redline already holds every change for the vendor'); else toast('This contract is already out for signature'); break;
     case 'approve-hdr':
-      if(cur===10) await advanceTo('approve');
-      else if(cur>=11) toast('This contract is already approved');
+      if(cur===12) await advanceTo('approve');
+      else if(cur>=13) toast('This contract is already approved');
       else modal(`<div class="mh"><span class="ic" style="background:var(--warn-soft);color:var(--warn)">${ico('i-alert')}</span><h3>Not ready to approve</h3></div>
         <div class="mb">${cur<8?'This draft has <b>9 open deviations</b> from your template, 4 of them high risk. Compare it with the template first.':'<b>2 deviations</b> still need your call: limitation of liability and insurance.'}</div>
         <div class="mf"><button class="btn out" data-act="close-modal">Close</button>${cur===7?'<button class="btn pri" data-act="m-compare">Compare with our template</button>':''}</div>`);
       break;
-    case 'm-compare': closeModal(); if(cur===7) await advanceTo('redline'); break;
+    case 'm-compare': closeModal(); if(cur===7) await advanceTo('compare'); break;
     /* --- the real AppMod.AI shell controls --- */
     case 'projects': show('projects'); break;
     case 'pj-open': { const p=el.dataset.p; if(/Vendor contracts|Facilities/.test(p)) { show('corpus'); toast('Opened project · '+p); } else toast('Opened project · '+p+' (sample)'); break; }
@@ -3375,7 +3653,7 @@ document.addEventListener('click',async e=>{
 });
 $('#ov-filter').addEventListener('click',e=>{ if(e.target.id==='ov-filter') closeOv(); });
 $('#ov-hamb').addEventListener('click',e=>{ if(e.target.id==='ov-hamb') closeOv(); });
-$('#modal-bg').addEventListener('click',e=>{ if(e.target.id==='modal-bg'&&cur!==11){ closeModal(); updateHint(); } });
+$('#modal-bg').addEventListener('click',e=>{ if(e.target.id==='modal-bg'&&cur!==13){ closeModal(); updateHint(); } });
 $('#mode-search')?.addEventListener('input',e=>filterModes(e.target.value));
 $('#pj-search').addEventListener('input',renderProjects);
 $('#hist-search')?.addEventListener('input',e=>{ const q=e.target.value.toLowerCase(); $$('#ov-hamb .p-sidebar-content button, #ov-hamb .p-sidebar-content [class*="rounded"]').forEach(()=>{}); });

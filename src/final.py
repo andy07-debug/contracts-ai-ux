@@ -1,8 +1,9 @@
 import re,sys,subprocess,os
 H=open('shell.html').read()
+H=H.replace('<div class="flex space-x-4 items-center cursor-pointer">','<div class="flex space-x-4 items-center cursor-pointer" data-act="logo" id="logo-home" title="Home">',1)  # logo = reset to home
 body=H[H.find('<body'):H.rfind('</body>')]
 body=body.replace('<!--SCREENS-->',open('screens.html').read())
-defs=open('../cux/defs.svg').read()+'''<defs>
+defs=open('defs.svg').read()+'''<defs>
 <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16zM14 6l3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M3 22h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
 <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M5 7h14M5 7l-3 7a3.5 3.5 0 0 0 6 0zM19 7l-3 7a3.5 3.5 0 0 0 6 0z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></symbol>
 <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></symbol>
@@ -33,6 +34,7 @@ over=defs+'''
 body=body.replace('<!--OVERLAYS-->',over)
 open('withscreens.html','w').write('<html><head></head>'+body+'</body></html>')
 css=open('shell.css').read()
+css=css.replace('b, strong { font-weight: bolder; }\n','b, strong { font-weight: bolder; }\nsmall { font-size: 80%; }\n',1)  # kept by hand in the live page
 page=f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Contracts AI Mode · CW | Techolution</title>
@@ -44,10 +46,12 @@ page=f'''<!doctype html>
 <style>{open('legacy.css').read()}</style>
 <style>{open('app.css').read()}</style>
 <style>{open('legal.css').read()}</style>
+<style>{open('analysis.css').read()}</style>
 </head>
 {body}
 <script>{open('data.js').read()}
 {open('legal.js').read()}
+{open('analysis.js').read()}
 {open('app.js').read()}</script>
 </body></html>'''
 out=sys.argv[1] if len(sys.argv)>1 else 'out/index.html'
